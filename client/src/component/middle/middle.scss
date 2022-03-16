@@ -1,0 +1,7 @@
+.index > .middle {
+	height: calc(100% - 48px - 48px - 16px);
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}

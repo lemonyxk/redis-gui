@@ -1,0 +1,33 @@
+{
+	"default": {
+		"--body-background-color": "#f8f8f8",
+		"--appbar-background-color": "#f50057",
+
+		"--log-background-color": "#fafafa",
+		"--log-color": "#333",
+
+		"--m-left-background-color": "#fff",
+		"--tree-color": "#111",
+		"--tree-list-item-hover-background-color": "#f5f5f5",
+		"--tree-list-item-select-background-color": "#e8e8e8",
+
+		"--v-list-item-background-color": "#fafafa",
+		"--v-list-item-border-color": "#ddd",
+		"--v-list-item-select-background-color": "#e8e8e8",
+
+		"--black-button-color": "black",
+		"--white-button-color": "white",
+		"--warning-button-color": "#ed6c02",
+		"--normal-button-color": "#1976d2",
+		"--error-button-color": "#d32f2f",
+
+		"--success-button-background-color": "#2e7d32",
+		"--error-button-background-color": "#d32f2f",
+		"--normal-button-background-color": "#1976d2",
+		"--save-button-background-color": "brown",
+		"--add-row-button-background-color": "darkcyan",
+		"--delete-row-button-background-color": "red",
+		"--ttl-button-background-color": "teal",
+		"--transparent-button-background-color": "transparent"
+	}
+}

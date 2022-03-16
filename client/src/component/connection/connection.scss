@@ -1,0 +1,82 @@
+.connection {
+	display: flex;
+	justify-content: flex-start;
+	align-content: center;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+	padding: 5px;
+
+	> .header {
+		width: 100%;
+		height: 48px;
+		display: flex;
+		text-align: center;
+		justify-content: center;
+		align-content: center;
+		line-height: 48px;
+	}
+
+	> .middle {
+		width: 100%;
+		height: calc(100% - 48px - 48px);
+
+		> .connection-list {
+			width: 100%;
+			height: 48px;
+			display: flex;
+			justify-content: center;
+			align-content: center;
+
+			> .left {
+				height: 100%;
+				width: 40%;
+				display: flex;
+				justify-content: flex-start;
+				align-content: center;
+				> div {
+					width: 100%;
+					display: flex;
+					justify-content: flex-start;
+					align-content: center;
+					line-height: 48px;
+
+					> button {
+						width: 100%;
+						display: flex;
+						justify-content: flex-start;
+						align-content: center;
+						line-height: 48px;
+						overflow: hidden;
+						white-space: nowrap;
+						text-overflow: ellipsis;
+						text-transform: none;
+					}
+				}
+			}
+			> .right {
+				width: 60%;
+				height: 100%;
+				display: flex;
+				justify-content: flex-start;
+				align-content: center;
+			}
+		}
+	}
+
+	> .bottom {
+		width: 100%;
+		height: 48px;
+		justify-content: center;
+		align-content: center;
+		display: flex;
+	}
+}
+
+.dialogs-actions {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+}

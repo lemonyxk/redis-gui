@@ -1,0 +1,85 @@
+.key-info {
+	width: 100%;
+	height: 100%;
+
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+
+	> .paper {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0 5px;
+
+		> .left {
+			width: 50%;
+			height: 100%;
+			display: flex;
+			justify-content: flex-start;
+			align-items: center;
+
+			> .type,
+			.ttl,
+			.size {
+				height: 36px;
+				// width: 100px;
+				margin-right: 10px;
+				pointer-events: none;
+			}
+
+			> .path {
+				height: 36px;
+				width: 200px;
+				margin-right: 10px;
+			}
+		}
+
+		> .right {
+			width: 50%;
+			height: 100%;
+			display: flex;
+			justify-content: flex-end;
+			align-items: center;
+			> .rename,
+			.delete,
+			.reload,
+			.ttl-b {
+				margin-right: 10px;
+				height: 36px;
+			}
+		}
+	}
+}
+
+.ttl-box {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	width: 100%;
+	height: 100%;
+
+	> .content {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+		height: 100%;
+
+		> .ttl-input {
+			width: 100%;
+		}
+	}
+
+	> .actions {
+		margin-top: 10px;
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+		width: 100%;
+		height: 100%;
+	}
+}

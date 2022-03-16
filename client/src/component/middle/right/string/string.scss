@@ -1,0 +1,114 @@
+.string {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+
+	> .top {
+		width: 100%;
+		height: 48px;
+	}
+
+	> .middle {
+		margin-top: 5px;
+		width: 100%;
+		height: calc(100% - 48px - 5px);
+
+		> .paper {
+			width: 100%;
+			height: 100%;
+
+			> .top {
+				width: 100%;
+				height: 48px;
+				> .paper {
+					width: 100%;
+					height: 100%;
+					display: flex;
+					justify-content: flex-start;
+					align-items: center;
+					padding: 0 5px;
+					> .resType {
+						width: 100px;
+						height: 36px;
+						margin-right: 10px;
+					}
+					> .size {
+						margin-right: 10px;
+					}
+				}
+			}
+
+			> .middle {
+				margin-top: 5px;
+				width: 100%;
+				height: calc(100% - 48px - 5px);
+				> .paper {
+					width: 100%;
+					height: 100%;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					> .res {
+						width: 100%;
+						height: 100%;
+						display: flex;
+						justify-content: space-around;
+						align-items: center;
+						flex-direction: column;
+						> .top {
+							padding: 5px;
+							width: 100%;
+							height: calc(100% - 48px - 10px);
+							display: flex;
+							justify-content: center;
+							align-items: center;
+
+							> .string-content {
+								width: 100%;
+								height: 100% !important;
+								overflow-y: scroll !important;
+								outline: none;
+								border: none;
+								resize: none;
+								font-size: 1rem;
+							}
+						}
+
+						> .middle {
+							width: 100%;
+							height: 48px;
+							display: flex;
+							justify-content: center;
+							align-items: center;
+
+							> .left {
+								width: 50%;
+								height: 100%;
+							}
+
+							> .right {
+								width: 50%;
+								height: 100%;
+								display: flex;
+								justify-content: flex-end;
+								align-items: center;
+
+								> .save {
+									margin: 0 5px;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+.string-content::-webkit-scrollbar {
+	width: 0px;
+	height: 0px;
+}

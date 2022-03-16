@@ -1,0 +1,68 @@
+.log {
+	width: 100%;
+	height: 100%;
+
+	padding: 5px;
+
+	> .tabs {
+		width: 100%;
+		height: 48px;
+		.tabs-indica {
+			background-color: unset;
+		}
+
+		> div {
+			width: 100%;
+			height: 100%;
+			display: flex;
+			justify-content: flex-start;
+			align-items: flex-start;
+
+			> div {
+				width: 100%;
+				height: 100%;
+				> button {
+					width: 200px;
+					height: 100%;
+				}
+			}
+		}
+	}
+
+	> .content {
+		width: 100%;
+		height: calc(100% - 48px);
+		overflow-y: auto !important;
+
+		> div {
+			min-height: 24px;
+			width: 100%;
+			font-size: 14px;
+			user-select: text;
+			white-space: pre-wrap;
+			// text-overflow: ellipsis;
+			display: flex;
+			justify-content: flex-start;
+			// align-items: center;
+			line-height: 24px;
+		}
+	}
+}
+
+.log::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+.log::-webkit-scrollbar-track {
+	/* border-radius: 3px; */
+	/* background: rgba(115, 18, 226, 0.16); */
+	box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.08);
+}
+
+.log::-webkit-scrollbar-thumb {
+	/* border-radius: 3px; */
+	// background: rgba(20, 5, 107, 0.06);
+	// box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.08);
+	background-color: white;
+}

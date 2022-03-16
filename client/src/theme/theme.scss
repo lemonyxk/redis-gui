@@ -1,0 +1,104 @@
+.full-width-height {
+	width: 100%;
+	height: 100%;
+}
+
+.body-background-color {
+	background-color: var(--body-background-color);
+}
+
+.appbar-background-color {
+	background-color: var(--appbar-background-color) !important;
+}
+
+.log-background-color {
+	background-color: var(--log-background-color);
+}
+
+.m-left-background-color {
+	background-color: var(--m-left-background-color) !important;
+}
+
+.tree-list-item :hover {
+	background-color: var(--tree-list-item-hover-background-color);
+}
+
+.tree-list-item-background {
+	background-color: var(--tree-list-item-select-background-color);
+}
+
+.v-list-item {
+	border-bottom: 1px solid var(--v-list-item-border-color);
+}
+
+.v-list-item:last-child {
+	border-bottom: none;
+}
+
+.v-list-item:nth-child(odd) {
+	background-color: var(--v-list-item-background-color);
+}
+
+.v-list-item-background {
+	background-color: var(--v-list-item-select-background-color) !important;
+}
+
+.log-color {
+	color: var(--log-color);
+}
+
+.tree-color {
+	color: var(--tree-color);
+}
+
+.success-button {
+	background-color: var(--success-button-background-color) !important;
+}
+
+.error-button {
+	background-color: var(--error-button-background-color) !important;
+}
+
+.save-button {
+	background-color: var(--save-button-background-color) !important;
+}
+
+.ttl-button {
+	background-color: var(--ttl-button-background-color) !important;
+}
+
+.normal-button {
+	background-color: var(--normal-button-background-color) !important;
+}
+
+.add-row-button {
+	background-color: var(--add-row-button-background-color) !important;
+}
+
+.delete-row-button {
+	background-color: var(--delete-row-button-background-color) !important;
+}
+
+.black-color {
+	color: var(--black-button-color) !important;
+}
+
+.white-color {
+	color: var(--white-button-color) !important;
+}
+
+.warning-color {
+	color: var(--warning-button-color) !important;
+}
+
+.normal-color {
+	color: var(--normal-button-color) !important;
+}
+
+.error-color {
+	color: var(--error-button-color) !important;
+}
+
+.transparent-button {
+	background-color: var(--transparent-button-background-color) !important;
+}

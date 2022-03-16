@@ -1,0 +1,23 @@
+.header {
+	height: 48px;
+	width: 100%;
+	display: flex;
+	justify-content: flex-start;
+	align-content: center;
+
+	.left {
+		width: 50%;
+		height: 100%;
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+	}
+
+	.right {
+		width: 50%;
+		height: 100%;
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+	}
+}

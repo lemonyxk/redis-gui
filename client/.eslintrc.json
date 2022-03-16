@@ -1,0 +1,11 @@
+{
+	"env": {
+		"browser": true
+	},
+	"globals": {
+		"angular": true
+	},
+	"rules": {
+		"eqeqeq": ["off"]
+	}
+}

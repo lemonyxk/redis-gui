@@ -1,0 +1,103 @@
+@import "/src/theme/theme.scss";
+
+body {
+	margin: 0;
+	padding: 0;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+		sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+
+	overflow: hidden;
+	height: 100%;
+	box-sizing: border-box;
+}
+
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	user-select: none;
+}
+
+code {
+	font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+#root {
+	height: 100vh;
+	width: 100vw;
+}
+
+/* 滚动槽 */
+
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+::-webkit-scrollbar-track {
+	/* border-radius: 3px; */
+	/* background: rgba(115, 18, 226, 0.16); */
+	box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.08);
+}
+
+/* 滚动条滑块 */
+
+::-webkit-scrollbar-thumb {
+	/* border-radius: 3px; */
+	background: rgba(20, 5, 107, 0.06);
+	box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.08);
+}
+
+.ka-wrapper,
+.ka-content {
+	height: 100%;
+	width: 100%;
+}
+.MuiOutlinedInput-root > fieldset {
+	border: 1px solid #ccc !important;
+}
+
+.MuiOutlinedInput-input {
+	padding: 0.4rem 0.75rem !important;
+}
+
+.MuiSelect-select {
+	background: none !important;
+}
+
+.MuiInputBase-root::after {
+	border-bottom: none !important;
+}
+
+.MuiTreeItem-content {
+	padding: 0 2px !important;
+}
+
+.MuiTreeItem-label {
+	padding-left: 2px !important;
+}
+
+.MuiTreeItem-label {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+/* .Mui-focused {
+	background-color: rgba(0, 0, 0, 0) !important;
+}
+.Mui-selected {
+	background-color: rgba(25, 118, 210, 0.08) !important;
+} */
+
+/* input {
+	filter: none;
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+	transition-delay: 99999s;
+} */
