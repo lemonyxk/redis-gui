@@ -97,7 +97,7 @@ class String extends Component {
 									<Paper elevation={3} className="top">
 										<TextareaAutosize
 											onChange={(e) => (this.value = e.target.value)}
-											className="string-content"
+											className="string-content none-scrollbar"
 											defaultValue={this.state.res || ""}
 											spellCheck={false}
 										/>

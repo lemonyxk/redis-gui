@@ -15,6 +15,7 @@ import event from "../../../../tools/event";
 import Left from "../../left/left";
 import Right from "../right";
 import store from "../../../../tools/store";
+import { Resizable } from "re-resizable";
 
 class Hash extends Component {
 	constructor(props) {
@@ -191,7 +192,16 @@ class Hash extends Component {
 							<Paper className="paper">
 								<div className="res">
 									<div className="top">
-										<div className="left">
+										<Resizable
+											defaultSize={{ width: 500 }}
+											minWidth={500}
+											maxWidth={800}
+											bounds=".top"
+											enable={{ right: true }}
+											// disableDragging={true}
+											className="left"
+											grid={[1, 2]}
+										>
 											<AutoSizer>
 												{({ width, height }) => (
 													<Paper className="paper" elevation={3}>
@@ -212,12 +222,12 @@ class Hash extends Component {
 													</Paper>
 												)}
 											</AutoSizer>
-										</div>
+										</Resizable>
 										<div className="right">
 											<Paper className="top" elevation={3}>
 												<TextareaAutosize
 													onChange={(e) => this.changeKey(e.target.value)}
-													className="hash-key-content"
+													className="hash-key-content none-scrollbar"
 													value={this.state.selectKey || ""}
 													spellCheck={false}
 												/>
@@ -225,7 +235,7 @@ class Hash extends Component {
 											<Paper className="middle" elevation={3}>
 												<TextareaAutosize
 													onChange={(e) => this.changeValue(e.target.value)}
-													className="hash-value-content"
+													className="hash-value-content none-scrollbar"
 													value={this.state.selectValue || ""}
 													spellCheck={false}
 												/>

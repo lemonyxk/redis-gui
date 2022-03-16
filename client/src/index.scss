@@ -29,27 +29,6 @@ code {
 	width: 100vw;
 }
 
-/* 滚动槽 */
-
-::-webkit-scrollbar {
-	width: 8px;
-	height: 8px;
-}
-
-::-webkit-scrollbar-track {
-	/* border-radius: 3px; */
-	/* background: rgba(115, 18, 226, 0.16); */
-	box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.08);
-}
-
-/* 滚动条滑块 */
-
-::-webkit-scrollbar-thumb {
-	/* border-radius: 3px; */
-	background: rgba(20, 5, 107, 0.06);
-	box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.08);
-}
-
 .ka-wrapper,
 .ka-content {
 	height: 100%;

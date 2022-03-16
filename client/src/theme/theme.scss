@@ -102,3 +102,28 @@
 .transparent-button {
 	background-color: var(--transparent-button-background-color) !important;
 }
+
+::-webkit-scrollbar {
+	width: var(--all-webkit-scrollbar-width);
+	height: var(--all-webkit-scrollbar-height);
+}
+
+::-webkit-scrollbar-track {
+	/* border-radius: 3px; */
+	/* background: rgba(115, 18, 226, 0.16); */
+	// box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.08);
+	box-shadow: var(--all-webkit-scrollbar-track-box-shadow);
+}
+
+::-webkit-scrollbar-thumb {
+	/* border-radius: 3px; */
+	// background: rgba(20, 5, 107, 0.06);
+	background: var(--all-webkit-scrollbar-thumb-background-color);
+	// box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.08);
+	box-shadow: var(--all-webkit-scrollbar-thumb-box-shadow);
+}
+
+.none-scrollbar::-webkit-scrollbar {
+	width: 0px;
+	height: 0px;
+}

@@ -15,6 +15,7 @@ import event from "../../../../tools/event";
 import Left from "../../left/left";
 import Right from "../right";
 import store from "../../../../tools/store";
+import { Resizable } from "re-resizable";
 
 class Stream extends Component {
 	constructor(props) {
@@ -152,7 +153,16 @@ class Stream extends Component {
 							<Paper className="paper">
 								<div className="res">
 									<div className="top">
-										<div className="left">
+										<Resizable
+											defaultSize={{ width: 500 }}
+											minWidth={500}
+											maxWidth={800}
+											bounds=".top"
+											enable={{ right: true }}
+											// disableDragging={true}
+											className="left"
+											grid={[1, 2]}
+										>
 											<AutoSizer>
 												{({ width, height }) => (
 													<Paper className="paper" elevation={3}>
@@ -173,25 +183,26 @@ class Stream extends Component {
 													</Paper>
 												)}
 											</AutoSizer>
-										</div>
+										</Resizable>
+
 										<div className="right">
 											<Paper className="top-id" elevation={3}>
 												<TextareaAutosize
-													className="stream-id-content"
+													className="stream-id-content none-scrollbar"
 													value={this.state.res[this.selectIndex] ? this.state.res[this.selectIndex].id : ""}
 													spellCheck={false}
 												/>
 											</Paper>
 											<Paper className="top" elevation={3}>
 												<TextareaAutosize
-													className="stream-key-content"
+													className="stream-key-content none-scrollbar"
 													value={this.state.res[this.selectIndex] ? this.state.res[this.selectIndex].key : ""}
 													spellCheck={false}
 												/>
 											</Paper>
 											<Paper className="middle" elevation={3}>
 												<TextareaAutosize
-													className="stream-value-content"
+													className="stream-value-content none-scrollbar"
 													value={this.state.res[this.selectIndex] ? this.state.res[this.selectIndex].value : ""}
 													spellCheck={false}
 												/>

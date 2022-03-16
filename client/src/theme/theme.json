@@ -28,6 +28,12 @@
 		"--add-row-button-background-color": "darkcyan",
 		"--delete-row-button-background-color": "red",
 		"--ttl-button-background-color": "teal",
-		"--transparent-button-background-color": "transparent"
+		"--transparent-button-background-color": "transparent",
+
+		"--all-webkit-scrollbar-width": "8px",
+		"--all-webkit-scrollbar-height": "8px",
+		"--all-webkit-scrollbar-track-box-shadow": "inset 0 0 5px rgba(0, 0, 0, 0.08)",
+		"--all-webkit-scrollbar-thumb-background-color": "rgba(20, 5, 107, 0.06)",
+		"--all-webkit-scrollbar-thumb-box-shadow": "inset 0 0 5px rgba(0, 0, 0, 0.08)"
 	}
 }

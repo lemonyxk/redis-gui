@@ -25,6 +25,8 @@ func main() {
 
 	http.Start()
 
+	websocket.PTY()
+
 	// var client, err = redis.NewFailover("master", "1354243", []string{"192.168.0.100:16379"})
 	// if err != nil {
 	// 	panic(err)

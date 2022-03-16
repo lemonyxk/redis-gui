@@ -446,13 +446,14 @@ class Left extends Component {
 		);
 	}
 
-	async refresh(id) {
+	async refresh(id, shouldDelete) {
 		var node = null;
 
+		// id is null
 		if (!id) {
 			node = this.state.data.children[0];
 		} else {
-			node = this.findNode(id);
+			node = this.findNode(id) || this.state.data.children[0];
 		}
 
 		if (!node) {
@@ -460,6 +461,7 @@ class Left extends Component {
 		}
 
 		node.parent.children = [];
+
 		this.setState({ data: this.state.data });
 		return await this.getNodes(node.parent, node.parent.path, 1);
 	}

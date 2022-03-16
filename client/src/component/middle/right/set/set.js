@@ -15,6 +15,7 @@ import event from "../../../../tools/event";
 import Left from "../../left/left";
 import Right from "../right";
 import store from "../../../../tools/store";
+import { Resizable } from "re-resizable";
 
 class Set extends Component {
 	constructor(props) {
@@ -181,7 +182,16 @@ class Set extends Component {
 							<Paper className="paper">
 								<div className="res">
 									<div className="top">
-										<div className="left">
+										<Resizable
+											defaultSize={{ width: 500 }}
+											minWidth={500}
+											maxWidth={800}
+											bounds=".top"
+											enable={{ right: true }}
+											// disableDragging={true}
+											className="left"
+											grid={[1, 2]}
+										>
 											<AutoSizer>
 												{({ width, height }) => (
 													<Paper className="paper" elevation={3}>
@@ -202,12 +212,12 @@ class Set extends Component {
 													</Paper>
 												)}
 											</AutoSizer>
-										</div>
+										</Resizable>
 										<div className="right">
 											<Paper className="middle" elevation={3}>
 												<TextareaAutosize
 													onChange={(e) => this.changeValue(e.target.value)}
-													className="set-value-content"
+													className="set-value-content none-scrollbar"
 													value={this.state.selectValue || ""}
 													spellCheck={false}
 												/>
