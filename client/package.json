@@ -28,7 +28,6 @@
 		"react-toastify": "^8.2.0",
 		"react-treebeard": "^3.2.4",
 		"react-virtualized": "^9.22.3",
-		"recharts": "^2.1.9",
 		"sass": "^1.49.7",
 		"store": "^2.0.12",
 		"web-vitals": "^2.1.4",

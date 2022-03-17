@@ -12,7 +12,7 @@ import theme from "./theme/theme";
 
 // console.warn = () => {};
 
-const uuid = store.get("uuid");
+var uuid = store.get("uuid");
 
 if (!uuid) {
 	uuid = Math.random().toString(36).slice(2);
