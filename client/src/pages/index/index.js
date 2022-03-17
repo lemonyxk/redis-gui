@@ -4,7 +4,7 @@ import "./index.scss";
 import Header from "../../component/header/header";
 import Middle from "../../component/middle/middle";
 import Bottom from "../../component/bottom/bottom";
-import Socket from "../../tools/socket";
+import Socket from "../../lib/socket";
 import event from "../../tools/event";
 import message from "../../tools/message";
 import utils from "../../tools/utils";
@@ -12,6 +12,8 @@ import store from "../../tools/store";
 import Api from "../../tools/api";
 import Connection from "../../component/connection/connection";
 import Left from "../../component/middle/left/left";
+import ws from "../../tools/socket";
+import Ball from "../../component/ball/ball";
 
 class Index extends Component {
 	render() {
@@ -19,13 +21,15 @@ class Index extends Component {
 			<div className="index body-background-color">
 				<Header></Header>
 				<Middle></Middle>
-				<Bottom></Bottom>
+				<Ball></Ball>
+				{/* <Bottom></Bottom> */}
 			</div>
 		);
 	}
 
-	socket = null;
 	load = null;
+
+	uuid = store.get("uuid");
 
 	start() {
 		message.close();
@@ -36,7 +40,7 @@ class Index extends Component {
 			utils.after(800).then(() => {
 				var db = parseInt(data.db);
 				store.set("db", db);
-				this.socket.Emit("/login", {
+				ws.socket.Emit("/login", {
 					name: data.name,
 					split: data.split,
 					db: db,
@@ -61,6 +65,7 @@ class Index extends Component {
 			return message.error(data.msg);
 		}
 
+		ws.socket.Global.token = data.msg.Token;
 		this.load.done(data.status);
 		store.set("token", data.msg.Token);
 		store.set("connected", data.msg.name);
@@ -92,17 +97,18 @@ class Index extends Component {
 	componentDidMount() {
 		this.load = message.loading("connecting...");
 		store.remove("connected");
-		this.socket = new Socket({ addr: Api.ws });
-		this.socket.AddListener("/login", this.login.bind(this));
-		this.socket.AddListener("/loading", this.loading.bind(this));
-		this.socket.AddListener("/serverLog", this.serverLog.bind(this));
-		this.socket.Start(() => this.start());
+		ws.socket = new Socket({ addr: Api.ws });
+		ws.socket.Global.uuid = this.uuid;
+		ws.socket.AddListener("/login", this.login.bind(this));
+		ws.socket.AddListener("/loading", this.loading.bind(this));
+		ws.socket.AddListener("/serverLog", this.serverLog.bind(this));
+		ws.socket.Start(() => this.start());
 	}
 
 	componentWillUnmount() {
-		this.socket.RemoveListener("/login");
-		this.socket.RemoveListener("/loading");
-		this.socket.Close();
+		ws.socket.RemoveListener("/login");
+		ws.socket.RemoveListener("/loading");
+		ws.socket.Close();
 	}
 }
 

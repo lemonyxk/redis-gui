@@ -24,7 +24,7 @@ class KeyInfo extends Component {
 	render() {
 		return (
 			<div className="key-info">
-				<Paper className="paper">
+				<Paper elevation={3} className="paper">
 					<div className="left">
 						<Button variant="outlined" className="type">
 							{this.state.type}

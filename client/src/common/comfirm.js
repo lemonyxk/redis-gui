@@ -43,53 +43,6 @@ BootstrapDialogTitle.propTypes = {
 	onClose: PropTypes.func.isRequired,
 };
 
-// function ComfirmContainer(props) {
-// 	let width = props.width === null ? 800 : parseInt(props.width);
-// 	let height = props.height === null ? 500 : parseInt(props.height);
-// 	let padding = parseInt(props.padding);
-
-// 	const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-// 		"& .MuiDialogContent-root": {
-// 			padding: padding !== null ? padding : theme.spacing(2),
-// 		},
-// 		"& .MuiDialogActions-root": {
-// 			padding: theme.spacing(1),
-// 		},
-// 		"& .MuiPaper-root": {
-// 			width: width,
-// 			height: height + 64 + 52.5,
-// 		},
-// 		"& .MuiDialog-container": {
-// 			width: "100%",
-// 			height: "100%",
-// 		},
-// 	}));
-
-// 	const [open, setOpen] = React.useState(false);
-
-// 	return (
-// 		<div>
-// 			<BootstrapDialog
-// 				// onClose={handleClose}
-// 				aria-labelledby="customized-dialog-title"
-// 				open={open}
-// 				fullWidth={true}
-// 				maxWidth={"lg"}
-// 			>
-// 				{props.title ? (
-// 					<BootstrapDialogTitle style={{ height: 64 }} id="customized-dialog-title" onClose={props.onClose}>
-// 						{props.title}
-// 					</BootstrapDialogTitle>
-// 				) : null}
-// 				<DialogContent style={{ height: height, width: width }} dividers>
-// 					{props.content}
-// 				</DialogContent>
-// 				{props.actions ? <DialogActions style={{ height: 52.5 }}>{props.actions}</DialogActions> : null}
-// 			</BootstrapDialog>
-// 		</div>
-// 	);
-// }
-
 class ComfirmContainer extends Component {
 	constructor(props) {
 		super(props);
@@ -100,11 +53,21 @@ class ComfirmContainer extends Component {
 
 	title = "";
 	text = "";
+	autoClose = false;
+	style = {};
 
 	onOpen(config = {}) {
 		this.width = config.width === undefined ? 800 : parseInt(config.width);
 		this.height = config.height === undefined ? 500 : parseInt(config.height);
 		this.padding = parseInt(config.padding);
+
+		if (config.title) {
+			this.height += 64;
+		}
+
+		if (config.actions) {
+			this.height += 52.5;
+		}
 
 		this.BootstrapDialog = styled(Dialog)(({ theme }) => ({
 			"& .MuiDialogContent-root": {
@@ -115,7 +78,7 @@ class ComfirmContainer extends Component {
 			},
 			"& .MuiPaper-root": {
 				width: this.width,
-				height: this.height + 64 + 52.5,
+				height: this.height,
 			},
 			"& .MuiDialog-container": {
 				width: "100%",
@@ -136,12 +99,20 @@ class ComfirmContainer extends Component {
 
 		this.title = config.title || "";
 		this.text = config.text || "";
+		this.autoClose = config.autoClose || false;
+		this.style = config.style || {};
 
-		this.setState({ open: true });
+		this.config = config;
+
+		this.setState({ open: true }, () => {
+			config.onOpen && config.onOpen();
+		});
 	}
 
 	onClose() {
-		this.setState({ open: false });
+		this.setState({ open: false }, () => {
+			this.config.onClose && this.config.onClose();
+		});
 	}
 
 	render() {
@@ -149,7 +120,7 @@ class ComfirmContainer extends Component {
 			<div>
 				{this.state.open ? (
 					<this.BootstrapDialog
-						// onClose={handleClose}
+						onClose={this.autoClose ? () => this.onClose() : () => {}}
 						aria-labelledby="customized-dialog-title"
 						open={this.state.open}
 						fullWidth={true}
@@ -160,7 +131,7 @@ class ComfirmContainer extends Component {
 								{this.title}
 							</BootstrapDialogTitle>
 						) : null}
-						<DialogContent style={{ height: this.height, width: this.width }} dividers>
+						<DialogContent style={{ height: this.height, width: this.width, ...this.style }} dividers>
 							{this.text}
 						</DialogContent>
 						{this.actions ? <DialogActions style={{ height: 52.5 }}>{this.actions}</DialogActions> : null}
@@ -180,18 +151,3 @@ function ComfirmBox(props) {
 }
 
 export { ComfirmContainer, ComfirmBox, Comfirm };
-
-// <Dialog fullScreen={false} fullWidth={true} open={this.state.open} aria-labelledby="responsive-dialog-title">
-// 	<DialogTitle id="responsive-dialog-title">{this.title}</DialogTitle>
-// 	<DialogContent>
-// 		<DialogContentText>{this.text}</DialogContentText>
-// 	</DialogContent>
-// 	<DialogActions>
-// 		<Button autoFocus onClick={() => this.cancel()}>
-// 			cancel
-// 		</Button>
-// 		<Button onClick={() => this.submit()} autoFocus>
-// 			submit
-// 		</Button>
-// 	</DialogActions>
-// </Dialog>

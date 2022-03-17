@@ -94,9 +94,9 @@ class List extends Component {
 					) : null}
 				</div>
 				<div className="middle">
-					<Paper className="paper">
+					<Paper elevation={3} className="paper">
 						<div className="top">
-							<Paper className="paper">
+							<Paper elevation={3} className="paper">
 								<Button variant="outlined" className="size">
 									{this.state.size}
 								</Button>
@@ -117,7 +117,7 @@ class List extends Component {
 							</Paper>
 						</div>
 						<div className="middle">
-							<Paper className="paper">
+							<Paper elevation={3} className="paper">
 								<div className="res">
 									<div className="top">
 										<Resizable
@@ -132,7 +132,7 @@ class List extends Component {
 										>
 											<AutoSizer>
 												{({ width, height }) => (
-													<Paper className="paper" elevation={3}>
+													<Paper elevation={3} className="paper">
 														<VList
 															ref={this.vlist}
 															// className={styles.List}
@@ -152,7 +152,7 @@ class List extends Component {
 											</AutoSizer>
 										</Resizable>
 										<div className="right">
-											<Paper className="middle" elevation={3}>
+											<Paper elevation={3} className="middle">
 												<TextareaAutosize
 													onChange={(e) => this.changeValue(e.target.value)}
 													className="list-value-content none-scrollbar"

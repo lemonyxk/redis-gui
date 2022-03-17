@@ -32,14 +32,21 @@ func before(stream *http.Stream) error {
 		return errors.New("token is empty")
 	}
 
-	var conn = app.Connections.Get(stream.ClientIP())
+	if stream.Empty("uuid") {
+		_ = stream.JsonFormat("ERROR", 404, "uuid is empty")
+		return errors.New("uuid is empty")
+	}
+
+	var uuid = stream.AutoGet("uuid").String()
+
+	var conn = app.Connections.Get(uuid)
 	if conn == nil {
 		_ = stream.JsonFormat("ERROR", 404, "connection not found")
 		return errors.New("connection not found")
 	}
 
 	var db = stream.AutoGet("db").Int()
-	var uuid = conn.GetUUID()
+	var infoID = conn.GetInfoID()
 	var token = stream.AutoGet("token").String()
 
 	if token != conn.Token {
@@ -53,11 +60,11 @@ func before(stream *http.Stream) error {
 	conn.GetModel().Handler.Do(context.Background(), "SELECT", fmt.Sprintf("%d", db))
 	// console.Info("command select db:", db)
 
-	var data = app.DataMap.Get(db, uuid)
+	var data = app.DataMap.Get(db, infoID)
 
 	if data == nil {
 		data = data2.NewData(conn.Split)
-		app.DataMap.Set(db, uuid, data)
+		app.DataMap.Set(db, infoID, data)
 		go func() {
 			createData(conn, data, db)
 		}()

@@ -127,9 +127,9 @@ class Stream extends Component {
 					) : null}
 				</div>
 				<div className="middle">
-					<Paper className="paper">
+					<Paper elevation={3} className="paper">
 						<div className="top">
-							<Paper className="paper">
+							<Paper elevation={3} className="paper">
 								<Button variant="outlined" className="size">
 									{this.state.size}
 								</Button>
@@ -150,7 +150,7 @@ class Stream extends Component {
 							</Paper>
 						</div>
 						<div className="middle">
-							<Paper className="paper">
+							<Paper elevation={3} className="paper">
 								<div className="res">
 									<div className="top">
 										<Resizable
@@ -165,7 +165,7 @@ class Stream extends Component {
 										>
 											<AutoSizer>
 												{({ width, height }) => (
-													<Paper className="paper" elevation={3}>
+													<Paper elevation={3} className="paper">
 														<VList
 															ref={this.vlist}
 															// className={styles.List}
@@ -186,21 +186,21 @@ class Stream extends Component {
 										</Resizable>
 
 										<div className="right">
-											<Paper className="top-id" elevation={3}>
+											<Paper elevation={3} className="top-id">
 												<TextareaAutosize
 													className="stream-id-content none-scrollbar"
 													value={this.state.res[this.selectIndex] ? this.state.res[this.selectIndex].id : ""}
 													spellCheck={false}
 												/>
 											</Paper>
-											<Paper className="top" elevation={3}>
+											<Paper elevation={3} className="top">
 												<TextareaAutosize
 													className="stream-key-content none-scrollbar"
 													value={this.state.res[this.selectIndex] ? this.state.res[this.selectIndex].key : ""}
 													spellCheck={false}
 												/>
 											</Paper>
-											<Paper className="middle" elevation={3}>
+											<Paper elevation={3} className="middle">
 												<TextareaAutosize
 													className="stream-value-content none-scrollbar"
 													value={this.state.res[this.selectIndex] ? this.state.res[this.selectIndex].value : ""}

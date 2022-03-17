@@ -69,9 +69,9 @@ class String extends Component {
 					) : null}
 				</div>
 				<div className="middle">
-					<Paper className="paper">
+					<Paper elevation={3} className="paper">
 						<div className="top">
-							<Paper className="paper">
+							<Paper elevation={3} className="paper">
 								<Button variant="outlined" className="size">
 									{this.state.size}
 								</Button>

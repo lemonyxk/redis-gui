@@ -19,17 +19,20 @@ import (
 )
 
 func Close(conn *server.Conn) {
+
 	console.Info("websocket server:", conn.FD, "close")
-	var client = app.Connections.Get(conn.ClientIP())
+
+	var client = app.Connections.Get(conn.Name)
 	if client == nil {
 		return
 	}
+
 	var t = time.Now()
 	time.AfterFunc(time.Second*10, func() {
 		if client.Time.Sub(t) < 0 {
 			client.Close()
-			app.Connections.Delete(conn.ClientIP())
-			console.Info("[websocket]", "close", conn.ClientIP())
+			app.Connections.Delete(conn.Name)
+			console.Info("[websocket]", "close", conn.Name, conn.ClientIP())
 		}
 	})
 }

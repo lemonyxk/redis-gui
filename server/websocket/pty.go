@@ -12,117 +12,43 @@ package websocket
 
 import (
 	"encoding/json"
-	"flag"
-	"io/ioutil"
-	"log"
-	"net/http"
 	"os"
-	"os/exec"
 	"runtime"
+	"sync"
+	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"github.com/lemoyxk/console"
+	kitty2 "github.com/lemoyxk/kitty/v2"
+	"github.com/lemoyxk/kitty/v2/http"
+	"github.com/lemoyxk/kitty/v2/socket/websocket/server"
 	pty "github.com/runletapp/go-console"
+	"server/app"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
+var ptyMap = PtyMap{data: make(map[int64]pty.Console)}
+
+type PtyMap struct {
+	data map[int64]pty.Console
+	mux  sync.RWMutex
 }
 
-func handleWebsocket(w http.ResponseWriter, r *http.Request) {
+func (p *PtyMap) Get(key int64) pty.Console {
+	p.mux.RLock()
+	defer p.mux.RUnlock()
+	return p.data[key]
+}
 
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+func (p *PtyMap) Set(key int64, value pty.Console) {
+	p.mux.Lock()
+	defer p.mux.Unlock()
+	p.data[key] = value
+}
 
-	proc, err := pty.New(80, 24)
-	if err != nil {
-		panic(err)
-	}
-
-	var args []string
-
-	cmd := exec.Command("/bin/bash", "-l")
-	cmd.Env = append(os.Environ(), "TERM=xterm")
-
-	if runtime.GOOS == "windows" {
-		args = []string{"cmd.exe", "-l"}
-	} else {
-		args = []string{"/bin/bash", "-l"}
-	}
-
-	proc.SetENV(append(os.Environ(), "TERM=xterm"))
-
-	if err := proc.Start(args); err != nil {
-		panic(err)
-	}
-
-	defer func() {
-		proc.Close()
-		conn.Close()
-	}()
-
-	// defer current.Reset()
-	//
-	//
-	// if err := current.SetRaw(); err != nil {
-	// 	log.Println(err)
-	// 	return
-	// }
-	//
-	// ws, err := current.Size()
-
-	// current.Resize(ws)
-
-	go func() {
-		for {
-			buf := make([]byte, 1024)
-			read, err := proc.Read(buf)
-			if err != nil {
-				conn.WriteMessage(websocket.TextMessage, []byte(err.Error()))
-				console.Error(err)
-				return
-			}
-			conn.WriteMessage(websocket.BinaryMessage, buf[:read])
-		}
-	}()
-
-	var size Size
-
-	for {
-		_, reader, err := conn.NextReader()
-		if err != nil {
-			console.Error(err)
-			return
-		}
-
-		bts, err := ioutil.ReadAll(reader)
-		if err != nil {
-			console.Error(err)
-			return
-		}
-
-		err = json.Unmarshal(bts, &size)
-		if err == nil {
-			proc.SetSize(size.Cols, size.Rows)
-			continue
-		}
-
-		// var buf  = bytes.NewReader(bts)
-		proc.Write(bts)
-
-		// _, err = io.Copy(proc, buf)
-		// if err != nil {
-		// 	console.Error(err)
-		// }
-	}
+func (p *PtyMap) Delete(key int64) {
+	p.mux.Lock()
+	defer p.mux.Unlock()
+	delete(p.data, key)
 }
 
 type Size struct {
@@ -132,11 +58,115 @@ type Size struct {
 
 func PTY() {
 
-	flag.Parse()
+	var ws = &app.WebSocket{}
+	ws.Addr = "127.0.0.1:8669"
 
-	r := mux.NewRouter()
+	var webSocketServerRouter = kitty2.NewWebSocketServerRouter()
 
-	r.HandleFunc("/", handleWebsocket)
+	Router(webSocketServerRouter)
 
-	go console.Info(http.ListenAndServe("127.0.0.1:8669", r))
+	ws.OnOpen = func(conn *server.Conn) {
+
+		var stream = http.NewStream(conn.Response, conn.Request)
+		stream.ParseQuery()
+
+		var token = stream.Query.First("token").String()
+		var uuid = stream.Query.First("uuid").String()
+		if token == "" || uuid == "" {
+			_ = conn.Close()
+			return
+		}
+
+		var client = app.Connections.Get(uuid)
+		if client == nil {
+			_ = conn.Close()
+			return
+		}
+
+		if client.Token != token {
+			_ = conn.Close()
+			return
+		}
+
+		var p = ptyMap.Get(conn.FD)
+		if p == nil {
+			var proc, err = pty.New(80, 24)
+			if err != nil {
+				panic(err)
+			}
+			p = proc
+			ptyMap.Set(conn.FD, proc)
+		}
+
+		var args []string
+
+		switch runtime.GOOS {
+		case "windows":
+			args = []string{"cmd.exe", "-l"}
+		default:
+			args = []string{"/bin/bash", "-c", "$SHELL -l"}
+		}
+
+		_ = p.SetENV(append(os.Environ(), "TERM=xterm"))
+
+		if err := p.Start(args); err != nil {
+			panic(err)
+		}
+
+		go func() {
+			for {
+				buf := make([]byte, 1024)
+				read, err := p.Read(buf)
+				if err != nil {
+					return
+				}
+				_ = conn.Conn.WriteMessage(websocket.BinaryMessage, buf[:read])
+			}
+		}()
+
+	}
+
+	ws.OnClose = func(conn *server.Conn) {
+		var p = ptyMap.Get(conn.FD)
+		if p == nil {
+			return
+		}
+		_ = p.Close()
+		ptyMap.Delete(conn.FD)
+		console.Info(conn.FD, "pty close")
+	}
+
+	ws.OnUnknown = func(conn *server.Conn, message []byte, next server.Middle) {
+
+		if len(message) == 0 {
+			return
+		}
+
+		var size Size
+
+		var p = ptyMap.Get(conn.FD)
+		if p == nil {
+			return
+		}
+
+		var err = json.Unmarshal(message, &size)
+		if err == nil {
+			_ = p.SetSize(size.Cols, size.Rows)
+			return
+		}
+
+		_, _ = p.Write(message)
+	}
+
+	ws.PingHandler = func(conn *server.Conn) func(appData string) error {
+		return func(appData string) error {
+			return conn.Conn.SetReadDeadline(time.Now().Add(ws.HeartBeatTimeout))
+		}
+	}
+
+	ws.OnSuccess = func() {
+		console.Info("websocket server start success", app.Server.Addr)
+	}
+
+	go ws.SetRouter(webSocketServerRouter).Start()
 }

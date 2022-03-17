@@ -12,6 +12,13 @@ import theme from "./theme/theme";
 
 // console.warn = () => {};
 
+const uuid = store.get("uuid");
+
+if (!uuid) {
+	uuid = Math.random().toString(36).slice(2);
+	store.set("uuid", uuid);
+}
+
 axios.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
 
 axios.defaults.baseURL = "";
@@ -58,11 +65,11 @@ axios.interceptors.request.use((request) => {
 		delete req.signal;
 		delete req.insecureHTTPParser;
 
-		request.params = { ...req, db, token };
+		request.params = { ...req, db, token, uuid };
 	}
 
 	if (request.method === "post") {
-		request.data = Qs.stringify({ ...request.data, db, token });
+		request.data = Qs.stringify({ ...request.data, db, token, uuid });
 	}
 
 	return request;

@@ -20,6 +20,7 @@ import (
 	"github.com/lemoyxk/console"
 	"github.com/lemoyxk/kitty/v2/http"
 	"github.com/lemoyxk/kitty/v2/kitty"
+	"github.com/lemoyxk/utils"
 	"server/message"
 	"server/redis"
 )
@@ -44,10 +45,13 @@ type Info struct {
 	FD        int64
 	Token     string
 
+	InfoAll     []string
+	EmitInfoAll bool
+
 	message.Login
 }
 
-func (i *Info) GetUUID() string {
+func (i *Info) GetInfoID() string {
 	return i.Os + i.ProcessID + i.Split
 }
 
@@ -62,11 +66,102 @@ func (i *Info) Watch() {
 
 	var p = i.model.Handler.PSubscribe(context.Background(), channel)
 
+	var stop = false
+
+	go func() {
+		for !stop {
+
+			time.Sleep(time.Second * 3)
+
+			var res, err = i.model.Handler.Info(context.Background(), "all").Result()
+			if err != nil {
+				console.Error(err)
+				continue
+			}
+
+			var info = kitty.M{}
+			var name = ""
+
+			var lines = strings.Split(res, "\r\n")
+			for i := 0; i < len(lines); i++ {
+				if lines[i] == "\r" || lines[i] == "" {
+					continue
+				}
+
+				if lines[i][0] == '#' {
+
+					if lines[i][2:] == "Commandstats" {
+						name = lines[i][2:]
+						info[name] = kitty.M{}
+					} else {
+						name = lines[i][2:]
+						info[name] = kitty.M{}
+					}
+
+					continue
+				}
+
+				if name == "Commandstats" {
+
+					var kv = strings.Split(lines[i], ":")
+					if len(kv) != 2 {
+						continue
+					}
+
+					info[name].(kitty.M)[kv[0]] = kitty.M{}
+
+					var kv2 = strings.Split(kv[1], ",")
+
+					for j := 0; j < len(kv2); j++ {
+						var kv3 = strings.Split(kv2[j], "=")
+						if len(kv3) != 2 {
+							continue
+						}
+
+						info[name].(kitty.M)[kv[0]].(kitty.M)[kv3[0]] = kv3[1]
+					}
+
+					continue
+				}
+
+				var kv = strings.Split(lines[i], ":")
+
+				if len(kv) != 2 {
+					continue
+				}
+
+				info[name].(kitty.M)[kv[0]] = kv[1]
+			}
+
+			info["Time"] = time.Now().Format("15:04:05")
+
+			var str = string(utils.Json.Encode(info))
+
+			i.InfoAll = append(i.InfoAll, str)
+
+			if len(i.InfoAll) > 300 {
+				i.InfoAll = i.InfoAll[1:]
+			}
+
+			if i.EmitInfoAll {
+				_ = Server.Json(i.FD, Json{
+					Event: "/infoAll",
+					Data: http.JsonFormat{
+						Status: "SUCCESS",
+						Code:   200,
+						Msg:    []string{str},
+					},
+				})
+			}
+		}
+	}()
+
 	go func() {
 		for {
 			msg, err := p.ReceiveMessage(context.Background())
 			if err != nil {
-				console.Info(err)
+				console.Error(err)
+				stop = true
 				return
 			}
 
@@ -106,6 +201,10 @@ func (i *Info) Watch() {
 			}
 		}
 	}()
+}
+
+func (i *Info) SetEmitInfoAll(flag bool) {
+	i.EmitInfoAll = flag
 }
 
 func (i *Info) SetModel(model *redis.Model) {

@@ -34,6 +34,13 @@
 		"--all-webkit-scrollbar-height": "8px",
 		"--all-webkit-scrollbar-track-box-shadow": "inset 0 0 5px rgba(0, 0, 0, 0.08)",
 		"--all-webkit-scrollbar-thumb-background-color": "rgba(20, 5, 107, 0.06)",
-		"--all-webkit-scrollbar-thumb-box-shadow": "inset 0 0 5px rgba(0, 0, 0, 0.08)"
+		"--all-webkit-scrollbar-thumb-box-shadow": "inset 0 0 5px rgba(0, 0, 0, 0.08)",
+
+		"--terminal-background": "rgba(0, 0, 0, 0.8)",
+		"--terminal-foreground": "#eee",
+		"--terminal-cursor": "#fff",
+		"--terminal-font-size": 14,
+		"--terminal-line-height": 1.2,
+		"--terminal-font-family": "source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace"
 	}
 }

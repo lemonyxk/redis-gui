@@ -105,6 +105,9 @@ class Main {
 			height = size.height * 0.9;
 		}
 
+		if (width < 900) width = 900;
+		if (height < 600) height = 600;
+
 		this.mainWindow = new BrowserWindow({
 			width: this.dev ? size.width * 1 : width,
 			height: this.dev ? size.height * 1 : height,

@@ -15,5 +15,10 @@ import (
 )
 
 func Router(router *server.Router) {
-	router.Route("/login").Handler(Login)
+	router.Group().Handler(func(handler *server.RouteHandler) {
+		handler.Route("/login").Handler(Login)
+
+		handler.Route("/infoAll").Before(Before).Handler(InfoAll)
+		handler.Route("/closeInfoAll").Before(Before).Handler(CloseInfoAll)
+	})
 }

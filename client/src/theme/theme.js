@@ -13,7 +13,11 @@
 //
 
 class Theme {
+	themeName = "";
+
 	init = (themeName) => {
+		this.themeName = themeName;
+
 		var themes = require("./theme.json");
 		for (const name in themes) {
 			if (name === themeName) {
@@ -25,4 +29,6 @@ class Theme {
 	};
 }
 
-export default new Theme();
+var theme = new Theme();
+
+export default theme;

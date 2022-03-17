@@ -11,6 +11,7 @@
 package websocket
 
 import (
+	"sync"
 	"time"
 
 	"github.com/lemoyxk/console"
@@ -22,13 +23,13 @@ import (
 	"server/message"
 )
 
+var mux sync.RWMutex
+
 func Login(conn *server.Conn, stream *socket.Stream) error {
 
 	var err error
 	var login message.Login
 	err = utils.Json.Decode(stream.Data, &login)
-
-	console.Infof("login: %+v\n", login)
 
 	if err != nil {
 		return app.Server.Json(conn.FD, app.Json{
@@ -41,7 +42,13 @@ func Login(conn *server.Conn, stream *socket.Stream) error {
 		})
 	}
 
-	var info = app.Connections.Get(conn.ClientIP())
+	var uuid = utils.Json.Bytes(stream.Data).Get("uuid").String()
+	console.Info("uuid:", uuid)
+
+	mux.Lock()
+	defer mux.Unlock()
+
+	var info = app.Connections.Get(uuid)
 	if info == nil {
 		info, err = app.CreateInfo(login)
 		if err != nil {
@@ -55,11 +62,11 @@ func Login(conn *server.Conn, stream *socket.Stream) error {
 			})
 		}
 
-		app.Connections.Set(conn.ClientIP(), info)
+		app.Connections.Set(uuid, info)
 	} else {
 		if info.Name != login.Name || info.Split != login.Split {
 			info.Close()
-			app.Connections.Delete(conn.ClientIP())
+			app.Connections.Delete(uuid)
 			info, err = app.CreateInfo(login)
 			if err != nil {
 				return app.Server.Json(conn.FD, app.Json{
@@ -72,7 +79,7 @@ func Login(conn *server.Conn, stream *socket.Stream) error {
 				})
 			}
 
-			app.Connections.Set(conn.ClientIP(), info)
+			app.Connections.Set(uuid, info)
 		}
 	}
 
@@ -81,6 +88,8 @@ func Login(conn *server.Conn, stream *socket.Stream) error {
 	info.FD = conn.FD
 	info.Token = utils.Rand.UUID()
 	info.Login = login
+
+	conn.Name = uuid
 
 	return app.Server.Json(conn.FD, app.Json{
 		Event: stream.Event,

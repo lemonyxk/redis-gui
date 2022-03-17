@@ -16,69 +16,6 @@ import (
 	"server/data"
 )
 
-//
-// type KeyList struct {
-// 	sync.RWMutex
-// 	list map[string]struct{}
-// }
-//
-// func NewKeyList() *KeyList {
-// 	return &KeyList{
-// 		list: make(map[string]struct{}),
-// 	}
-// }
-//
-// func (k *KeyList) Get() []string {
-// 	k.RLock()
-// 	defer k.RUnlock()
-// 	keys := make([]string, 0, len(k.list))
-// 	for key := range k.list {
-// 		keys = append(keys, key)
-// 	}
-// 	return keys
-// }
-//
-// func (k *KeyList) Set(key string) {
-// 	k.Lock()
-// 	defer k.Unlock()
-// 	k.list[key] = struct{}{}
-// }
-//
-// func (k *KeyList) Delete(key string) {
-// 	k.Lock()
-// 	defer k.Unlock()
-// 	delete(k.list, key)
-// }
-
-// func NewDB() *DB {
-// 	return &DB{
-// 		data: make(map[string]*KeyList),
-// 	}
-// }
-
-// type DB struct {
-// 	data map[string]*KeyList
-// 	mux  sync.RWMutex
-// }
-//
-// func (d *DB) Set(key string, value *KeyList) {
-// 	d.mux.Lock()
-// 	defer d.mux.Unlock()
-// 	d.data[key] = value
-// }
-//
-// func (d *DB) Get(key string) *KeyList {
-// 	d.mux.RLock()
-// 	defer d.mux.RUnlock()
-// 	return d.data[key]
-// }
-
-// func (d *DB) Delete(key string) {
-// 	d.mux.Lock()
-// 	defer d.mux.Unlock()
-// 	delete(d.data, key)
-// }
-
 type DataList struct {
 	mux  sync.RWMutex
 	data map[int]map[string]*data.Data

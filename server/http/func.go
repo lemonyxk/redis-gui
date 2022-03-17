@@ -23,22 +23,23 @@ func List(stream *http.Stream) error {
 	var path = stream.Query.First("path").String()
 	var page = stream.Query.First("page").Int()
 	var limit = stream.Query.First("limit").Int()
+	var uuid = stream.Query.First("uuid").String()
 	var db = stream.Query.First("db").Int()
 	if limit > 1000 {
 		return stream.JsonFormat("ERROR", 404, "limit must less than 1000")
 	}
 
-	var conn = app.Connections.Get(stream.ClientIP())
-	var uuid = conn.GetUUID()
+	var conn = app.Connections.Get(uuid)
+	var infoID = conn.GetInfoID()
 
-	var data = app.DataMap.Get(db, uuid)
+	var data = app.DataMap.Get(db, infoID)
 
 	return stream.JsonFormat("SUCCESS", 200, data.Get(path, page, limit))
 }
 
 func DB(stream *http.Stream) error {
-
-	var conn = app.Connections.Get(stream.ClientIP())
+	var uuid = stream.Query.First("uuid").String()
+	var conn = app.Connections.Get(uuid)
 	var client = conn.GetModel()
 
 	db, err := client.Handler.Do(context.Background(), "CONFIG", "GET", "DATABASES").Result()
@@ -54,9 +55,10 @@ func DB(stream *http.Stream) error {
 
 // func Scan(stream *http.Stream) error {
 // 	var db = stream.Query.First("db").Int()
-// 	var conn = app.Connections.Get(stream.ClientIP())
-// 	var uuid = conn.GetUUID()
-// 	var data = app.DataMap.Get(db, uuid)
+//  var uuid = stream.Query.First("uuid").String()
+// 	var conn = app.Connections.Get(uuid)
+// 	var infoID = conn.GetInfoID()
+// 	var data = app.DataMap.Get(db, infoID)
 //
 // 	var res = data.Scan(20)
 //
@@ -67,7 +69,8 @@ func DB(stream *http.Stream) error {
 
 func Type(stream *http.Stream) error {
 	var path = stream.Query.First("path").String()
-	var conn = app.Connections.Get(stream.ClientIP())
+	var uuid = stream.Query.First("uuid").String()
+	var conn = app.Connections.Get(uuid)
 	var res, err = conn.GetModel().Handler.Type(context.Background(), path).Result()
 	if err != nil {
 		return stream.JsonFormat("ERROR", 404, err.Error())
@@ -76,8 +79,9 @@ func Type(stream *http.Stream) error {
 }
 
 func Do(stream *http.Stream) error {
+	var uuid = stream.Form.First("uuid").String()
 	var cmd = stream.Form.First("cmd").Bytes()
-	var conn = app.Connections.Get(stream.ClientIP())
+	var conn = app.Connections.Get(uuid)
 
 	var arr []interface{}
 	var err = utils.Json.Decode(cmd, &arr)

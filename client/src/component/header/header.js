@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { AppBar, FormControl, IconButton, InputLabel, Paper, Select, Toolbar, MenuItem } from "@material-ui/core";
+import { AppBar, FormControl, IconButton, InputLabel, Paper, Select, Toolbar, MenuItem, Menu, MenuList } from "@material-ui/core";
 import { Button } from "@mui/material";
 import { Menu as MenuIcon } from "@material-ui/icons";
 
@@ -9,11 +9,18 @@ import Connection from "../../component/connection/connection";
 import Log from "../../component/log/log";
 import Setting from "../setting/setting";
 
+import cli from "../cli/cli";
+import client from "../client/client";
+import memory from "../memory/memory";
+import network from "../network/network";
+import query from "../query/query";
+
 class Header extends Component {
 	state = {
 		onOpenConnection: false,
 		onOpenLog: false,
 		onOpenSetting: false,
+		onOpenMonitor: false,
 	};
 
 	openConnection() {
@@ -40,6 +47,16 @@ class Header extends Component {
 		this.setState({ onOpenSetting: false });
 	}
 
+	openMonitor(e) {
+		this.setState({ onOpenMonitor: true });
+		this.anchorEl = e.currentTarget;
+	}
+
+	closeMonitor() {
+		this.setState({ onOpenMonitor: false });
+		this.anchorEl = null;
+	}
+
 	render() {
 		return (
 			<div className="header">
@@ -53,6 +70,9 @@ class Header extends Component {
 							</div>
 
 							<div className="right">
+								<Button className="white-color" onClick={(e) => this.openMonitor(e)}>
+									monitor
+								</Button>
 								<Button className="white-color" onClick={() => this.openConnection()}>
 									connection
 								</Button>
@@ -66,6 +86,41 @@ class Header extends Component {
 						</Toolbar>
 					</AppBar>
 				</Paper>
+				<Menu
+					id="basic-menu"
+					anchorEl={this.anchorEl}
+					open={this.state.onOpenMonitor}
+					onClose={() => this.closeMonitor()}
+					MenuListProps={{
+						"aria-labelledby": "basic-button",
+					}}
+				>
+					<MenuItem>
+						<Button variant="contained" className="network-button" onClick={() => network.openCli()}>
+							network info
+						</Button>
+					</MenuItem>
+					<MenuItem>
+						<Button variant="contained" className="query-button" onClick={() => query.openCli()}>
+							query info
+						</Button>
+					</MenuItem>
+					<MenuItem>
+						<Button variant="contained" className="memory-button" onClick={() => memory.openCli()}>
+							memory info
+						</Button>
+					</MenuItem>
+					<MenuItem>
+						<Button variant="contained" className="client-button" onClick={() => client.openCli()}>
+							client info
+						</Button>
+					</MenuItem>
+					<MenuItem>
+						<Button variant="contained" className="cli-button" onClick={() => cli.openCli()}>
+							open terminal
+						</Button>
+					</MenuItem>
+				</Menu>
 				<Draw
 					anchor="right"
 					style={{
