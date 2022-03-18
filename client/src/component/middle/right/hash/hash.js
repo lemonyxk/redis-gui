@@ -301,7 +301,7 @@ class Hash extends Component {
 							var cmd = ["HDEL", this.props.path, this.state.selectKey];
 							await Api.do(cmd);
 							if (this.state.size == 1) {
-								event.emitComponent(Left, "left-deleteKey", this.props.data);
+								event.emitComponent(Left, "left-refresh", this.props.data);
 								event.emitComponent(Right, "right-closeKey", this.props.data);
 							} else {
 								this.reset();

@@ -21,3 +21,27 @@
 		align-items: center;
 	}
 }
+
+.monitor-menu {
+	.network-button {
+		width: 100%;
+	}
+	.query-button {
+		width: 100%;
+	}
+	.memory-button {
+		width: 100%;
+	}
+	.client-button {
+		width: 100%;
+	}
+	.cli-button {
+		width: 100%;
+	}
+	li button {
+		width: 100%;
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+	}
+}

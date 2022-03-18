@@ -20,6 +20,7 @@
 		"--warning-button-color": "#ed6c02",
 		"--normal-button-color": "#1976d2",
 		"--error-button-color": "#d32f2f",
+		"--secondary-button-color": "#9c27b0",
 
 		"--success-button-background-color": "#2e7d32",
 		"--error-button-background-color": "#d32f2f",

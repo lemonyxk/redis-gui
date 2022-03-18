@@ -8,6 +8,7 @@ import Api from "../../../../tools/api";
 import message from "../../../../tools/message";
 import Left from "../../left/left";
 import Right from "../right";
+import keyInfo from "../../../../common/key";
 
 class KeyInfo extends Component {
 	state = {
@@ -65,37 +66,7 @@ class KeyInfo extends Component {
 	}
 
 	async delete() {
-		Comfirm.open({
-			width: "400px",
-			height: "100px",
-			title: "Delete Key",
-			text: `Are you sure delete ${this.state.path} ?`,
-			actions: (
-				<div>
-					<Button autoFocus onClick={() => Comfirm.close()}>
-						cancel
-					</Button>
-					<Button
-						autoFocus
-						onClick={async () => {
-							// delete redis key
-							var cmd = ["DEL", this.state.path];
-							var res = await Api.do(cmd);
-							if (res.msg == "1") {
-								event.emitComponent(Left, "left-deleteKey", this.state.data);
-								event.emitComponent(Right, "right-closeKey", this.state.data);
-								message.success("rename success");
-							} else {
-								message.error(res.msg);
-							}
-							Comfirm.close();
-						}}
-					>
-						submit
-					</Button>
-				</div>
-			),
-		});
+		keyInfo.delete(this.state.data);
 	}
 
 	ttl() {
@@ -144,42 +115,7 @@ class KeyInfo extends Component {
 	}
 
 	rename() {
-		Comfirm.open({
-			width: "400px",
-			height: "100px",
-			title: "Rename Key",
-			text: `Are you sure rename ${this.state.path} to ${this.state.changePath}?`,
-			actions: (
-				<div>
-					<Button autoFocus onClick={() => Comfirm.close()}>
-						cancel
-					</Button>
-					<Button
-						autoFocus
-						onClick={async () => {
-							// rename redis key
-							if (this.state.changePath == this.state.path) {
-								message.error("no change");
-								Comfirm.close();
-								return;
-							}
-							var cmd = ["RENAME", this.state.path, this.state.changePath];
-							let res = await Api.do(cmd);
-							if (res.msg == "OK") {
-								event.emitComponent(Right, "right-closeKey", this.state.data);
-								event.emitComponent(Left, "left-refresh", { ...this.state.data, changePath: this.state.changePath });
-								message.success("rename success");
-							} else {
-								message.error(res.msg);
-							}
-							Comfirm.close();
-						}}
-					>
-						submit
-					</Button>
-				</div>
-			),
-		});
+		keyInfo.rename(this.state.data, this.state.changePath);
 	}
 }
 

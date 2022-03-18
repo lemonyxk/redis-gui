@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { AppBar, FormControl, IconButton, InputLabel, Paper, Select, Toolbar, MenuItem, Menu, MenuList } from "@material-ui/core";
 import { Button } from "@mui/material";
 import { Menu as MenuIcon } from "@material-ui/icons";
+import Divider from "@mui/material/Divider";
 
 import "./header.scss";
 import Draw from "../../common/draw";
@@ -20,7 +21,7 @@ class Header extends Component {
 		onOpenConnection: false,
 		onOpenLog: false,
 		onOpenSetting: false,
-		onOpenMonitor: false,
+		onOpenMonitor: null,
 	};
 
 	openConnection() {
@@ -48,13 +49,11 @@ class Header extends Component {
 	}
 
 	openMonitor(e) {
-		this.setState({ onOpenMonitor: true });
-		this.anchorEl = e.currentTarget;
+		this.setState({ onOpenMonitor: e.currentTarget });
 	}
 
 	closeMonitor() {
-		this.setState({ onOpenMonitor: false });
-		this.anchorEl = null;
+		this.setState({ onOpenMonitor: null });
 	}
 
 	render() {
@@ -73,6 +72,7 @@ class Header extends Component {
 								<Button className="white-color" onClick={(e) => this.openMonitor(e)}>
 									monitor
 								</Button>
+
 								<Button className="white-color" onClick={() => this.openConnection()}>
 									connection
 								</Button>
@@ -86,41 +86,7 @@ class Header extends Component {
 						</Toolbar>
 					</AppBar>
 				</Paper>
-				<Menu
-					id="basic-menu"
-					anchorEl={this.anchorEl}
-					open={this.state.onOpenMonitor}
-					onClose={() => this.closeMonitor()}
-					MenuListProps={{
-						"aria-labelledby": "basic-button",
-					}}
-				>
-					<MenuItem>
-						<Button variant="contained" className="network-button" onClick={() => network.openCli()}>
-							network info
-						</Button>
-					</MenuItem>
-					<MenuItem>
-						<Button variant="contained" className="query-button" onClick={() => query.openCli()}>
-							query info
-						</Button>
-					</MenuItem>
-					<MenuItem>
-						<Button variant="contained" className="memory-button" onClick={() => memory.openCli()}>
-							memory info
-						</Button>
-					</MenuItem>
-					<MenuItem>
-						<Button variant="contained" className="client-button" onClick={() => client.openCli()}>
-							client info
-						</Button>
-					</MenuItem>
-					<MenuItem>
-						<Button variant="contained" className="cli-button" onClick={() => cli.openCli()}>
-							open terminal
-						</Button>
-					</MenuItem>
-				</Menu>
+
 				<Draw
 					anchor="right"
 					style={{
@@ -159,6 +125,50 @@ class Header extends Component {
 				>
 					<Setting />
 				</Draw>
+
+				<Menu
+					anchorEl={this.state.onOpenMonitor}
+					open={!!this.state.onOpenMonitor}
+					onClose={() => this.closeMonitor()}
+					// MenuListProps={{ "aria-labelledby": "basic-button" }}
+					getContentAnchorEl={null}
+					anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+					className="monitor-menu"
+				>
+					<MenuItem>
+						<Button className="network-button secondary-color" onClick={() => network.openCli()}>
+							network info
+						</Button>
+					</MenuItem>
+					<Divider />
+
+					<MenuItem>
+						<Button className="query-button secondary-color" onClick={() => query.openCli()}>
+							query info
+						</Button>
+					</MenuItem>
+					<Divider />
+
+					<MenuItem>
+						<Button className="memory-button secondary-color" onClick={() => memory.openCli()}>
+							memory info
+						</Button>
+					</MenuItem>
+					<Divider />
+
+					<MenuItem>
+						<Button className="client-button secondary-color" onClick={() => client.openCli()}>
+							client info
+						</Button>
+					</MenuItem>
+					<Divider />
+
+					<MenuItem>
+						<Button className="cli-button secondary-color" onClick={() => cli.openCli()}>
+							open terminal
+						</Button>
+					</MenuItem>
+				</Menu>
 			</div>
 		);
 	}

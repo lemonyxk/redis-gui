@@ -2,17 +2,35 @@ class Event {
 	eventList = {};
 
 	add = (name, fn) => {
-		this.eventList[name] = fn;
+		if (!this.eventList[name]) {
+			this.eventList[name] = [];
+		}
+
+		var index = this.eventList[name].indexOf(fn);
+		if (index == -1) {
+			this.eventList[name].push(fn);
+		}
 	};
 
-	remove = (name) => {
-		delete this.eventList[name];
+	remove = (name, fn) => {
+		if (!this.eventList[name]) {
+			return;
+		}
+		var index = this.eventList[name].indexOf(fn);
+		if (index > -1) {
+			this.eventList[name].splice(index, 1);
+		}
 	};
 
 	emit = (name, data, fn) => {
 		if (!this.eventList[name]) return;
-		var res = this.eventList[name].call(this, data);
-		fn && fn(res);
+
+		for (var i = 0; i < this.eventList[name].length; i++) {
+			if (this.eventList[name][i]) {
+				var res = this.eventList[name][i].call(this, data);
+				fn && fn(res);
+			}
+		}
 	};
 
 	componentList = {};

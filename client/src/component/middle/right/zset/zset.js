@@ -233,7 +233,7 @@ class ZSet extends Component {
 							var cmd = ["zrem", this.props.path, this.state.selectValue];
 							await Api.do(cmd);
 							if (this.state.size == 1) {
-								event.emitComponent(Left, "left-deleteKey", this.props.data);
+								event.emitComponent(Left, "left-refresh", this.props.data);
 								event.emitComponent(Right, "right-closeKey", this.props.data);
 							} else {
 								this.getZSet(this.props.path);

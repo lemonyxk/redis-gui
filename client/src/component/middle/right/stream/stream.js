@@ -268,7 +268,7 @@ class Stream extends Component {
 							if (this.state.size == 1) {
 								var cmd = ["DEL", this.props.path];
 								await Api.do(cmd);
-								event.emitComponent(Left, "left-deleteKey", this.props.data);
+								event.emitComponent(Left, "left-refresh", this.props.data);
 								event.emitComponent(Right, "right-closeKey", this.props.data);
 							} else {
 								this.reset();

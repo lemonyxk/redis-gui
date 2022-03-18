@@ -283,7 +283,7 @@ class Set extends Component {
 							var cmd = ["srem", this.props.path, this.state.selectValue];
 							await Api.do(cmd);
 							if (this.state.size == 1) {
-								event.emitComponent(Left, "left-deleteKey", this.props.data);
+								event.emitComponent(Left, "left-refresh", this.props.data);
 								event.emitComponent(Right, "right-closeKey", this.props.data);
 							} else {
 								this.reset();
@@ -338,7 +338,7 @@ class Set extends Component {
 
 		var submit = async () => {
 			// set add row
-			var cmd = ["sadd", this.props.path, addRowValue];
+			var cmd = ["SADD", this.props.path, addRowValue];
 			await Api.do(cmd);
 			this.reset();
 			await this.getSet(this.props.path);
@@ -359,7 +359,7 @@ class Set extends Component {
 		var cmd = ["srem", this.props.path, oldValue];
 		await Api.do(cmd);
 
-		cmd = ["sadd", this.props.path, value];
+		cmd = ["SADD", this.props.path, value];
 		await Api.do(cmd);
 
 		this.reset();

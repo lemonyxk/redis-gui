@@ -7,6 +7,7 @@ import React, { Component } from "react";
 import ws from "../../tools/socket";
 
 import * as echarts from "echarts";
+import event from "../../tools/event";
 
 class QueryLine extends Component {
 	maxCount = 180;
@@ -107,12 +108,20 @@ class Query {
 		this.ref.current.update(res);
 	}
 
+	bindResize = this.onResize.bind(this);
+
+	onResize(data) {
+		this.window = data;
+	}
+
 	open() {
+		event.add("resize", this.bindResize);
 		ws.socket.AddListener("/infoAll", this.infoAll.bind(this));
 		ws.socket.Emit("/infoAll", {});
 	}
 
 	close() {
+		event.remove("resize", this.bindResize);
 		ws.socket.Emit("/closeInfoAll", {});
 		ws.socket.RemoveListener("/infoAll");
 	}

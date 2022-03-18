@@ -7,6 +7,7 @@ import themeJS from "../../theme/theme";
 const themes = require("../../theme/theme.json");
 import store from "../../tools/store";
 import { Comfirm } from "../../common/comfirm";
+import event from "../../tools/event";
 
 class Cli {
 	openCli() {
@@ -75,14 +76,21 @@ class Cli {
 			}, 1000);
 		};
 
-		window.addEventListener("resize", () => this.onResize());
+		event.add("resize", this.bindResize);
+	}
+
+	bindResize = this.onResize.bind(this);
+
+	onResize(data) {
+		this.window = data;
+		this.onResize();
 	}
 
 	close() {
+		event.remove("resize", this.bindResize);
 		clearInterval(this.t);
 		this.term && this.term.dispose();
 		this.socket && this.socket.close();
-		window.removeEventListener("resize", () => this.onResize());
 		this.term = null;
 		this.socket = null;
 	}

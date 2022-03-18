@@ -225,7 +225,7 @@ class List extends Component {
 							cmd = ["LREM", this.props.path, 0, random];
 							await Api.do(cmd);
 							if (this.state.size == 1) {
-								event.emitComponent(Left, "left-deleteKey", this.props.data);
+								event.emitComponent(Left, "left-refresh", this.props.data);
 								event.emitComponent(Right, "right-closeKey", this.props.data);
 							} else {
 								this.getList(this.props.path);

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import "./left.scss";
-import { FormControl, Select, MenuItem, Input, InputAdornment, Paper } from "@mui/material";
+import { Select, MenuItem, Input, InputAdornment, Paper, Menu, Button, InputLabel, FormControl } from "@mui/material";
+import { MenuItem as RMenuItem, Menu as RMenu } from "@material-ui/core";
 import SearchIcon from "@mui/icons-material/Search";
 import { Treebeard } from "react-treebeard";
 import { Description, PlayArrow } from "@material-ui/icons";
@@ -8,20 +9,44 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import event from "../../../tools/event";
 import { Resizable } from "re-resizable";
 import Api from "../../../tools/api";
-import CachedIcon from "@mui/icons-material/Cached";
 import store from "../../../tools/store";
 import Right from "../right/right";
+import Divider from "@mui/material/Divider";
+import keyInfo from "../../../common/key";
+import Popper from "../../../common/popper";
 
 class Left extends Component {
 	state = {
 		data: { children: [] },
 		dbList: {},
 		db: 0,
+		onOpenMenu: null,
+		onOpenPopper: null,
 	};
+
+	openMenu(e) {
+		this.setState({ onOpenMenu: e.currentTarget });
+	}
+
+	closeMenu() {
+		this.setState({ onOpenMenu: null });
+	}
+
+	openPopper(e) {
+		this.setState({ onOpenPopper: e });
+	}
+
+	closePopper() {
+		this.setState({ onOpenPopper: null });
+	}
 
 	limit = 100;
 
 	selectedNodeID = null;
+
+	menuEvent = null;
+
+	popperValue = "";
 
 	hasLoadMore = (children) => {
 		if (children.length > 0) {
@@ -80,7 +105,7 @@ class Left extends Component {
 
 	getNodes = async (parent = null, path = "", page = 1, limit = this.limit) => {
 		let data = await Api.list(path, page, limit);
-		return await this.renderNode(parent, data, page, limit);
+		return { parent, data, page, limit };
 	};
 
 	async renderNode(parent, data, page, limit) {
@@ -152,16 +177,12 @@ class Left extends Component {
 
 			this.setState({ data: this.state.data });
 		});
-		event.addComponentListener(Left, "left-deleteKey", (data) => {
+		event.addComponentListener(Left, "left-refresh", (data) => {
 			this.refresh(data.id);
 		});
-		event.addComponentListener(Left, "left-refresh", async (data) => {
+		event.addComponentListener(Left, "left-rename", async (data) => {
 			this.selectedNodeID = data.changePath + data.isDir + data.isKey;
 			await this.refresh(data.id);
-			var node = this.findNode(this.selectedNodeID);
-			if (node) {
-				this.onClick(node);
-			}
 		});
 	}
 
@@ -243,9 +264,10 @@ class Left extends Component {
 				// dbList: {},
 				db: parseInt(db),
 			},
-			() => {
+			async () => {
 				this.selectedNodeID = null;
-				this.getNodes(this.state.data, "", 1);
+				var { parent, data, page, limit } = await this.getNodes(this.state.data, "", 1);
+				await this.renderNode(parent, data, page, limit);
 			}
 		);
 	}
@@ -310,14 +332,19 @@ class Left extends Component {
 			return (
 				<div style={this.headerStyle}>
 					{node.path ? this.descriptionView : null}
-					{node.name}
+					<div className="item-desc">{node.name}</div>
 				</div>
 			);
 		},
 		Container: (props) => {
 			if (props.node.isDir) {
 				return (
-					<div className="tree-list-item tree-color" onClick={() => this.onClick(props.node)} style={this.containerStyle}>
+					<div
+						className="tree-list-item tree-color"
+						onContextMenuCapture={(e) => e.preventDefault()}
+						onClick={() => this.onDir(props.node)}
+						style={this.containerStyle}
+					>
 						{props.decorators.Toggle(props.node)}
 						{props.decorators.Header(props.node)}
 					</div>
@@ -330,14 +357,49 @@ class Left extends Component {
 			}
 
 			return (
-				<div className={classList.join(" ")} onClick={() => this.onClick(props.node)} style={this.containerStyle}>
+				<div
+					className={classList.join(" ")}
+					onContextMenuCapture={(e) => {
+						e.preventDefault();
+						if (this.selectedNodeID) {
+							var n = this.findNode(this.selectedNodeID);
+							if (n) {
+								n.selected = false;
+							}
+						}
+						this.selectedNodeID = props.node.id;
+						props.node.selected = true;
+						this.menuEvent = e;
+						this.openMenu(e);
+					}}
+					onClick={() => this.onSelect(props.node)}
+					onDoubleClick={() => this.onKey(props.node)}
+					style={this.containerStyle}
+				>
 					{props.decorators.Header(props.node)}
 				</div>
 			);
 		},
 	};
 
-	onClick = (node) => {
+	async onSelect(node) {
+		if (!node.isDir) {
+			if (node.path) {
+				if (this.selectedNodeID) {
+					var n = this.findNode(this.selectedNodeID);
+					if (n) {
+						n.selected = false;
+					}
+				}
+				this.selectedNodeID = node.id;
+				node.selected = true;
+				this.setState({ data: this.state.data });
+			}
+			return;
+		}
+	}
+
+	onKey = async (node) => {
 		if (!node.isDir) {
 			if (node.path) {
 				if (this.selectedNodeID) {
@@ -352,15 +414,23 @@ class Left extends Component {
 					this.onNode(node);
 				});
 			} else {
-				this.getNodes(node.parent, node.parent.path, node.page);
+				var { parent, data, page, limit } = await this.getNodes(node.parent, node.parent.path, node.page);
+				await this.renderNode(parent, data, page, limit);
 			}
+			return;
+		}
+	};
+
+	onDir = async (node) => {
+		if (!node.isDir) {
 			return;
 		}
 
 		node.toggled = !node.toggled;
 
 		if (node.toggled) {
-			this.getNodes(node, node.path);
+			var { parent, data, page, limit } = await this.getNodes(node, node.path);
+			await this.renderNode(parent, data, page, limit);
 		} else {
 			node.children = [];
 			this.setState({ data: this.state.data });
@@ -375,8 +445,6 @@ class Left extends Component {
 		store.set("db", db);
 		this.start(db);
 	}
-
-	window = store.get("window");
 
 	render() {
 		return (
@@ -434,7 +502,7 @@ class Left extends Component {
 									endAdornment={
 										<InputAdornment position="end" style={{ cursor: "pointer" }}>
 											<SearchIcon className="search-icon" />
-											<CachedIcon className="refresh-icon" onClick={() => this.refresh(this.selectedNodeID)} />
+											{/* <CachedIcon className="refresh-icon" onClick={() => this.refresh(this.selectedNodeID)} /> */}
 										</InputAdornment>
 									}
 								/>
@@ -442,11 +510,142 @@ class Left extends Component {
 						</div>
 					</Paper>
 				</Resizable>
+
+				<Popper
+					open={!!this.state.onOpenPopper}
+					onClose={() => {
+						var v = this.findNode(this.selectedNodeID);
+						if (v.path != this.popperValue) {
+							keyInfo.rename(v, this.popperValue, false);
+						}
+						this.closePopper();
+					}}
+					anchorEl={this.state.onOpenPopper}
+					transition
+				>
+					<Paper className="popper">
+						<div>
+							<FormControl fullWidth>
+								<InputLabel variant="standard" htmlFor="uncontrolled-native">
+									rename
+								</InputLabel>
+								<Input
+									variant={"standard"}
+									inputProps={{ id: "uncontrolled-native" }}
+									defaultValue={(() => {
+										var v = this.findNode(this.selectedNodeID);
+										var r = v ? v.path : "";
+										this.popperValue = r;
+										return r;
+									})()}
+									onChange={(e) => {
+										this.popperValue = e.target.value;
+									}}
+									autoComplete="off"
+									onClick={(e) => e.stopPropagation()}
+									onKeyDown={(e) => {
+										if (e.keyCode == 13) {
+											var v = this.findNode(this.selectedNodeID);
+											keyInfo.rename(v, this.popperValue, false);
+											return this.closePopper();
+										}
+									}}
+								/>
+							</FormControl>
+						</div>
+					</Paper>
+				</Popper>
+
+				<RMenu
+					anchorEl={this.state.onOpenMenu}
+					open={!!this.state.onOpenMenu}
+					onClose={() => this.closeMenu()}
+					// MenuListProps={{ "aria-labelledby": "basic-button" }}
+					// getContentAnchorEl={null}
+					anchorReference={"anchorPosition"}
+					anchorPosition={{
+						top: this.menuEvent ? this.menuEvent.pageY : 0,
+						left: this.menuEvent ? this.menuEvent.pageX : 0,
+					}}
+					onContextMenuCapture={(e) => e.preventDefault()}
+					className="left-menu"
+					autoFocus={false}
+				>
+					<RMenuItem
+						className="left-menu-list"
+						onClick={() => {
+							var node = this.findNode(this.selectedNodeID);
+							if (node) {
+								this.onNode(node);
+							}
+							this.closeMenu();
+						}}
+					>
+						<Button size="small" className="normal-color">
+							open
+						</Button>
+					</RMenuItem>
+					<Divider />
+
+					<RMenuItem
+						className="left-menu-list"
+						onClick={() => {
+							this.refresh(this.selectedNodeID);
+							this.closeMenu();
+						}}
+					>
+						<Button size="small" className="normal-color">
+							refresh
+						</Button>
+					</RMenuItem>
+					<Divider />
+
+					<RMenuItem
+						className="left-menu-list"
+						onClick={() => {
+							this.start(this.state.db);
+							this.closeMenu();
+						}}
+					>
+						<Button size="small" className="normal-color">
+							reload
+						</Button>
+					</RMenuItem>
+					<Divider />
+
+					<RMenuItem
+						className="left-menu-list"
+						onClick={(e) => {
+							// keyInfo.rename(this.selectedNodeID);
+							this.closeMenu();
+							this.openPopper(e);
+						}}
+					>
+						<Button size="small" className="secondary-color">
+							rename
+						</Button>
+					</RMenuItem>
+					<Divider />
+
+					<RMenuItem
+						className="eft-menu-list"
+						onClick={() => {
+							var n = this.findNode(this.selectedNodeID);
+							if (!n) return;
+							keyInfo.delete(n);
+							this.closeMenu();
+						}}
+					>
+						<Button size="small" className="error-color">
+							delete
+						</Button>
+					</RMenuItem>
+				</RMenu>
 			</div>
 		);
 	}
 
-	async refresh(id, shouldDelete) {
+	async refresh(id) {
 		var node = null;
 
 		// id is null
@@ -460,10 +659,64 @@ class Left extends Component {
 			return;
 		}
 
-		node.parent.children = [];
+		var map = {};
+		for (var i = 0; i < node.parent.children.length; i++) {
+			map[node.parent.children[i].id] = { i: i, v: false };
+		}
+
+		var { parent, data, page, limit } = await this.getNodes(node.parent, node.parent.path, 1);
+
+		// merge node parent and data
+		if (!data) {
+			data = [];
+		}
+
+		// add
+		for (var i = 0; i < data.length; i++) {
+			var el = data[i];
+			var id = el.Path + el.IsDir + el.IsKey;
+			var index = map[id];
+			if (!index) {
+				node.parent.children.push({
+					parent: node.parent,
+					name: el.Name,
+					id: id,
+					path: el.Path,
+					size: el.Size,
+					isDir: el.IsDir,
+					isKey: el.IsKey,
+					children: [],
+					selected: this.selectedNodeID == id,
+				});
+			} else {
+				map[id].v = true;
+			}
+		}
+
+		// remove
+		for (const id in map) {
+			if (map[id].v == false) {
+				node.parent.children.splice(map[id].i, 1);
+			}
+		}
+
+		if (node.parent.children.length === limit) {
+			node.parent.children.push({
+				parent: node.parent,
+				name: <ExpandMoreIcon />,
+				id: "",
+				path: "",
+				page: page + 1,
+				isDir: false,
+				isKey: true,
+				children: [],
+				selected: false,
+			});
+		}
+
+		node.parent.children.sort((a, b) => a.name.localeCompare(b.name));
 
 		this.setState({ data: this.state.data });
-		return await this.getNodes(node.parent, node.parent.path, 1);
 	}
 }
 

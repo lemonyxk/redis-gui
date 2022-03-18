@@ -5,8 +5,25 @@ import AddIcon from "@mui/icons-material/Add";
 import { Rnd } from "react-rnd";
 import store from "../../tools/store";
 import { Comfirm } from "../../common/comfirm";
+import event from "../../tools/event";
+import AddKey from "../addKey/addKey";
 
 class Ball extends Component {
+	componentDidMount() {
+		event.add("resize", this.bindResize);
+	}
+
+	componentWillUnmount() {
+		event.remove("resize", this.bindResize);
+	}
+
+	bindResize = this.onResize.bind(this);
+
+	onResize(data) {
+		this.window = data;
+		this.onDragStop({ x: 12, y: this.window.height - this.ballSize - 12 - 120 });
+	}
+
 	window = store.get("window");
 
 	ballSize = 40;
@@ -17,7 +34,16 @@ class Ball extends Component {
 		y: this.window.height - this.ballSize - 12 - 120,
 	};
 
-	onDragStop(e, d) {
+	isClick = false;
+
+	onDragStop(d) {
+		if (d.x == this.state.x && d.y == this.state.y) {
+			this.isClick = true;
+			return;
+		}
+
+		this.isClick = false;
+
 		var cx = d.x;
 		var cy = d.y;
 
@@ -120,8 +146,13 @@ class Ball extends Component {
 	}
 
 	onClick() {
+		if (!this.isClick) return;
+
 		Comfirm.open({
-			title: "Add Key",
+			autoClose: true,
+			width: 400,
+			height: 400,
+			text: <AddKey></AddKey>,
 		});
 	}
 
@@ -129,12 +160,12 @@ class Ball extends Component {
 		return (
 			<Rnd
 				position={{ x: this.state.x, y: this.state.y }}
-				onDragStop={(e, d) => this.onDragStop(e, d)}
-				onDrag={(e, d) => this.onDrag(e, d)}
+				onDragStop={(e, d) => this.onDragStop(d)}
 				enableResizing={false}
 				className="ball"
+				onClick={() => this.onClick()}
 			>
-				<Fab aria-label="add" onClick={() => this.onClick()}>
+				<Fab aria-label="add">
 					<AddIcon />
 				</Fab>
 			</Rnd>

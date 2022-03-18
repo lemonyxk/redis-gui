@@ -9,6 +9,7 @@ import { ComfirmContainer } from "./common/comfirm";
 import { HashRouter } from "react-router-dom";
 import store from "./tools/store";
 import theme from "./theme/theme";
+import event from "./tools/event";
 
 // console.warn = () => {};
 
@@ -90,14 +91,15 @@ axios.interceptors.response.use(
 	}
 );
 
-let width = window.innerWidth;
-let height = window.innerHeight;
+store.set("window", { width: window.innerWidth, height: window.innerHeight });
+window.addEventListener("resize", () => {
+	store.set("window", { width: window.innerWidth, height: window.innerHeight });
+	event.emit("resize", { width: window.innerWidth, height: window.innerHeight });
+});
 
 if (!store.get("config")) {
 	store.set("config", { show: 15, limit: 15 });
 }
-
-store.set("window", { height, width });
 
 theme.init(store.get("theme") || "default");
 
