@@ -17,6 +17,7 @@ import (
 	"github.com/lemoyxk/kitty/v2/kitty"
 	"github.com/lemoyxk/utils"
 	"server/app"
+	"server/data"
 )
 
 func List(stream *http.Stream) error {
@@ -25,16 +26,24 @@ func List(stream *http.Stream) error {
 	var limit = stream.Query.First("limit").Int()
 	var uuid = stream.Query.First("uuid").String()
 	var db = stream.Query.First("db").Int()
+
 	if limit > 1000 {
 		return stream.JsonFormat("ERROR", 404, "limit must less than 1000")
+	}
+	if limit < 1 {
+		return stream.JsonFormat("ERROR", 404, "limit must greater than 0")
+	}
+
+	if page < 1 {
+		return stream.JsonFormat("ERROR", 404, "page must greater than 0")
 	}
 
 	var conn = app.Connections.Get(uuid)
 	var infoID = conn.GetInfoID()
 
-	var data = app.DataMap.Get(db, infoID)
+	var d = app.DataMap.Get(db, infoID)
 
-	return stream.JsonFormat("SUCCESS", 200, data.Get(path, page, limit))
+	return stream.JsonFormat("SUCCESS", 200, d.Get(path, page, limit))
 }
 
 func DB(stream *http.Stream) error {
@@ -53,19 +62,49 @@ func DB(stream *http.Stream) error {
 	return stream.JsonFormat("SUCCESS", 200, kitty.M{"db": db, "key": key})
 }
 
-// func Scan(stream *http.Stream) error {
-// 	var db = stream.Query.First("db").Int()
-//  var uuid = stream.Query.First("uuid").String()
-// 	var conn = app.Connections.Get(uuid)
-// 	var infoID = conn.GetInfoID()
-// 	var data = app.DataMap.Get(db, infoID)
-//
-// 	var res = data.Scan(20)
-//
-// 	console.Pretty.Dump(res)
-//
-// 	return stream.JsonFormat("SUCCESS", 200, res)
-// }
+func Scan(stream *http.Stream) error {
+
+	if stream.Query.Empty("search") {
+		return stream.JsonFormat("ERROR", 404, "search is empty")
+	}
+
+	if stream.Query.Empty("limit") {
+		return stream.JsonFormat("ERROR", 404, "limit is empty")
+	}
+
+	var uuid = stream.Query.First("uuid").String()
+	var search = stream.Query.First("search").String()
+	var limit = stream.Query.First("limit").Int()
+	var iter = stream.Query.First("iter").Int()
+
+	if limit > 1000 {
+		return stream.JsonFormat("ERROR", 404, "limit must less than 1000")
+	}
+	if limit < 1 {
+		return stream.JsonFormat("ERROR", 404, "limit must greater than 0")
+	}
+
+	var conn = app.Connections.Get(uuid)
+
+	scanIter, iter, err := conn.GetModel().ScanIter(search, iter, limit)
+	if err != nil {
+		return stream.JsonFormat("ERROR", 404, err.Error())
+	}
+
+	var res []data.Info
+
+	for i := 0; i < len(scanIter); i++ {
+		res = append(res, data.Info{
+			Size:  0,
+			Name:  scanIter[i],
+			Path:  scanIter[i],
+			IsDir: false,
+			IsKey: true,
+		})
+	}
+
+	return stream.JsonFormat("SUCCESS", 200, kitty.M{"iter": iter, "data": res})
+}
 
 func Type(stream *http.Stream) error {
 	var path = stream.Query.First("path").String()

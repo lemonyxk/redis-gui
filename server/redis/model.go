@@ -105,6 +105,36 @@ func (m *Model) Scan(key string, count int) chan *ScanResult {
 	return ch
 }
 
+func (m *Model) ScanIter(key string, iter, count int) ([]string, int, error) {
+
+	var res []string
+
+	var cursor uint64 = uint64(iter)
+
+	for {
+		var keys []string
+		var err error
+		keys, cursor, err = m.Handler.Scan(context.Background(), cursor, key, int64(count)).Result()
+		if err != nil {
+			return nil, 0, err
+		}
+
+		for i := 0; i < len(keys); i++ {
+			res = append(res, keys[i])
+		}
+
+		if cursor == 0 {
+			break
+		}
+
+		if len(res) >= count {
+			break
+		}
+	}
+
+	return res, int(cursor), nil
+}
+
 func Client(option *redis.Options) *redis.Client {
 	return redis.NewClient(option)
 }

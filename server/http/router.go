@@ -16,10 +16,10 @@ import (
 
 func Router(router *server.Router) {
 	router.Group().Before(before).Handler(func(handler *server.RouteHandler) {
-		handler.Route("GET", "/list").Handler(List)
-		handler.Route("GET", "/db").Handler(DB)
-		// handler.Route("GET", "/all").Handler(Scan)
-		handler.Route("GET", "/type").Handler(Type)
-		handler.Route("POST", "/do").Handler(Do)
+		handler.Get("/list").Handler(List)
+		handler.Get("/db").Handler(DB)
+		handler.Get("/type").Handler(Type)
+		handler.Get("/scan").Handler(Scan)
+		handler.Post("/do").Handler(Do)
 	})
 }

@@ -87,7 +87,7 @@ func createData(conn *app.Info, data *data2.Data, db int) {
 
 	var t = time.Now()
 
-	var resChan = r.Scan("*", 100000)
+	var resChan = r.Scan("*", 50000)
 
 	var counter = 0
 
