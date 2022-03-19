@@ -30,8 +30,8 @@ class Ball extends Component {
 	initSpeed = 30;
 
 	state = {
-		x: 12,
 		y: this.window.height - this.ballSize - 12 - 120,
+		x: this.window.width - this.ballSize - 12,
 	};
 
 	isClick = false;

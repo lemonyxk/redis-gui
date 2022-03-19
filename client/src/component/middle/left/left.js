@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import "./left.scss";
-import { Select, MenuItem, Input, InputAdornment, Paper, Menu, Button, InputLabel, FormControl } from "@mui/material";
-import { MenuItem as RMenuItem, Menu as RMenu } from "@material-ui/core";
+import { Select, MenuItem, Input, InputAdornment, Paper, FormControl } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { Treebeard } from "react-treebeard";
 import { Description, PlayArrow } from "@material-ui/icons";
@@ -11,9 +10,10 @@ import { Resizable } from "re-resizable";
 import Api from "../../../tools/api";
 import store from "../../../tools/store";
 import Right from "../right/right";
-import Divider from "@mui/material/Divider";
-import keyInfo from "../../../common/key";
-import Popper from "../../../common/popper";
+import Popper from "./popper";
+import Menu from "./menu";
+import Tree from "./tree";
+import CloseIcon from "@mui/icons-material/Close";
 
 class Left extends Component {
 	state = {
@@ -22,6 +22,7 @@ class Left extends Component {
 		db: 0,
 		onOpenMenu: null,
 		onOpenPopper: null,
+		openSearch: false,
 	};
 
 	openMenu(e) {
@@ -47,6 +48,8 @@ class Left extends Component {
 	menuEvent = null;
 
 	popperValue = "";
+
+	searchValue = "";
 
 	hasLoadMore = (children) => {
 		if (children.length > 0) {
@@ -128,7 +131,7 @@ class Left extends Component {
 				selected: this.selectedNodeID == id,
 			});
 		}
-		if (data.length === limit) {
+		if (data.length >= limit) {
 			parent.children.push({
 				parent: parent,
 				name: <ExpandMoreIcon />,
@@ -150,6 +153,8 @@ class Left extends Component {
 	};
 
 	componentDidMount() {
+		this.loadTree();
+
 		event.addComponentListener(Left, "left-login", (data) => {
 			this.getDB();
 			this.start(data.db);
@@ -272,115 +277,12 @@ class Left extends Component {
 		);
 	}
 
-	style = {
-		tree: {
-			base: {
-				fontSize: "14px",
-				whiteSpace: "pre-wrap",
-				backgroundColor: "inherit",
-				height: "100%",
-				padding: "5px 0",
-			},
-		},
-	};
-
-	toggledView = (<PlayArrow style={{ height: 20, transform: "rotate(90deg)", position: "relative", top: "-1px" }} />);
-	unToggleView = (<PlayArrow style={{ height: 20 }} />);
-	loadingView = (<div>loading...</div>);
-	descriptionView = (<Description style={{ width: 14 }} />);
-
-	headerStyle = {
-		userSelect: "none",
-		cursor: "pointer",
-		display: "flex",
-		justifyContent: "flex-start",
-		alignItems: "center",
-		width: "100%",
-		height: "24px",
-	};
-
-	containerStyle = {
-		display: "flex",
-		justifyContent: "flex-start",
-		alignItems: "center",
-		height: "24px",
-		width: "100%",
-	};
-
-	decorators = {
-		Loading: (props) => {
-			return this.loadingView;
-		},
-		Toggle: (node) => {
-			if (node.toggled) return this.toggledView;
-			return this.unToggleView;
-		},
-		Header: (node) => {
-			this.headerStyle = node.parent.path ? this.headerStyle : { ...this.headerStyle, paddingLeft: 6 };
-			if (node.isDir) {
-				var l = node.children.length;
-				if (this.hasLoadMore(node.children)) {
-					l -= 1;
-				}
-				return (
-					<div style={this.headerStyle}>
-						{node.name} ({node.size})
-					</div>
-				);
-			}
-
-			return (
-				<div style={this.headerStyle}>
-					{node.path ? this.descriptionView : null}
-					<div className="item-desc">{node.name}</div>
-				</div>
-			);
-		},
-		Container: (props) => {
-			if (props.node.isDir) {
-				return (
-					<div
-						className="tree-list-item tree-color"
-						onContextMenuCapture={(e) => e.preventDefault()}
-						onClick={() => this.onDir(props.node)}
-						style={this.containerStyle}
-					>
-						{props.decorators.Toggle(props.node)}
-						{props.decorators.Header(props.node)}
-					</div>
-				);
-			}
-
-			var classList = ["tree-list-item", "tree-color"];
-			if (props.node.selected) {
-				classList.push("tree-list-item-background");
-			}
-
-			return (
-				<div
-					className={classList.join(" ")}
-					onContextMenuCapture={(e) => {
-						e.preventDefault();
-						if (this.selectedNodeID) {
-							var n = this.findNode(this.selectedNodeID);
-							if (n) {
-								n.selected = false;
-							}
-						}
-						this.selectedNodeID = props.node.id;
-						props.node.selected = true;
-						this.menuEvent = e;
-						this.openMenu(e);
-					}}
-					onClick={() => this.onSelect(props.node)}
-					onDoubleClick={() => this.onKey(props.node)}
-					style={this.containerStyle}
-				>
-					{props.decorators.Header(props.node)}
-				</div>
-			);
-		},
-	};
+	loadTree() {
+		var res = Tree(this);
+		for (const key in res) {
+			this[key] = res[key];
+		}
+	}
 
 	async onSelect(node) {
 		if (!node.isDir) {
@@ -414,8 +316,12 @@ class Left extends Component {
 					this.onNode(node);
 				});
 			} else {
-				var { parent, data, page, limit } = await this.getNodes(node.parent, node.parent.path, node.page);
-				await this.renderNode(parent, data, page, limit);
+				if (this.inSearch) {
+					this.renderSearch(this.iter);
+				} else {
+					var { parent, data, page, limit } = await this.getNodes(node.parent, node.parent.path, node.page);
+					await this.renderNode(parent, data, page, limit);
+				}
 			}
 			return;
 		}
@@ -429,8 +335,12 @@ class Left extends Component {
 		node.toggled = !node.toggled;
 
 		if (node.toggled) {
-			var { parent, data, page, limit } = await this.getNodes(node, node.path);
-			await this.renderNode(parent, data, page, limit);
+			if (this.inSearch) {
+				this.renderSearch(this.iter);
+			} else {
+				var { parent, data, page, limit } = await this.getNodes(node, node.path);
+				await this.renderNode(parent, data, page, limit);
+			}
 		} else {
 			node.children = [];
 			this.setState({ data: this.state.data });
@@ -499,10 +409,25 @@ class Left extends Component {
 									placeholder="search"
 									inputProps={{ id: "uncontrolled-native" }}
 									className="search-input"
+									defaultValue={this.searchValue}
+									onChange={(e) => (this.searchValue = e.target.value)}
+									ref={this.searchInput}
+									onKeyDown={(e) => {
+										if (e.keyCode === 13) {
+											this.startSearch();
+											this.renderSearch(0);
+										}
+									}}
 									endAdornment={
 										<InputAdornment position="end" style={{ cursor: "pointer" }}>
-											<SearchIcon className="search-icon" />
-											{/* <CachedIcon className="refresh-icon" onClick={() => this.refresh(this.selectedNodeID)} /> */}
+											{this.state.openSearch ? <CloseIcon className="close-icon" onClick={() => this.exitSearch()} /> : null}
+											<SearchIcon
+												className="search-icon"
+												onClick={() => {
+													this.startSearch();
+													this.renderSearch(0);
+												}}
+											/>
 										</InputAdornment>
 									}
 								/>
@@ -511,136 +436,8 @@ class Left extends Component {
 					</Paper>
 				</Resizable>
 
-				<Popper
-					open={!!this.state.onOpenPopper}
-					onClose={() => {
-						var v = this.findNode(this.selectedNodeID);
-						if (v.path != this.popperValue) {
-							keyInfo.rename(v, this.popperValue, false);
-						}
-						this.closePopper();
-					}}
-					anchorEl={this.state.onOpenPopper}
-					transition
-				>
-					<Paper className="popper">
-						<div>
-							<FormControl fullWidth>
-								<InputLabel variant="standard" htmlFor="uncontrolled-native">
-									rename
-								</InputLabel>
-								<Input
-									variant={"standard"}
-									inputProps={{ id: "uncontrolled-native" }}
-									defaultValue={(() => {
-										var v = this.findNode(this.selectedNodeID);
-										var r = v ? v.path : "";
-										this.popperValue = r;
-										return r;
-									})()}
-									onChange={(e) => {
-										this.popperValue = e.target.value;
-									}}
-									autoComplete="off"
-									onClick={(e) => e.stopPropagation()}
-									onKeyDown={(e) => {
-										if (e.keyCode == 13) {
-											var v = this.findNode(this.selectedNodeID);
-											keyInfo.rename(v, this.popperValue, false);
-											return this.closePopper();
-										}
-									}}
-								/>
-							</FormControl>
-						</div>
-					</Paper>
-				</Popper>
-
-				<RMenu
-					anchorEl={this.state.onOpenMenu}
-					open={!!this.state.onOpenMenu}
-					onClose={() => this.closeMenu()}
-					// MenuListProps={{ "aria-labelledby": "basic-button" }}
-					// getContentAnchorEl={null}
-					anchorReference={"anchorPosition"}
-					anchorPosition={{
-						top: this.menuEvent ? this.menuEvent.pageY : 0,
-						left: this.menuEvent ? this.menuEvent.pageX : 0,
-					}}
-					onContextMenuCapture={(e) => e.preventDefault()}
-					className="left-menu"
-					autoFocus={false}
-				>
-					<RMenuItem
-						className="left-menu-list"
-						onClick={() => {
-							var node = this.findNode(this.selectedNodeID);
-							if (node) {
-								this.onNode(node);
-							}
-							this.closeMenu();
-						}}
-					>
-						<Button size="small" className="normal-color">
-							open
-						</Button>
-					</RMenuItem>
-					<Divider />
-
-					<RMenuItem
-						className="left-menu-list"
-						onClick={() => {
-							this.refresh(this.selectedNodeID);
-							this.closeMenu();
-						}}
-					>
-						<Button size="small" className="normal-color">
-							refresh
-						</Button>
-					</RMenuItem>
-					<Divider />
-
-					<RMenuItem
-						className="left-menu-list"
-						onClick={() => {
-							this.start(this.state.db);
-							this.closeMenu();
-						}}
-					>
-						<Button size="small" className="normal-color">
-							reload
-						</Button>
-					</RMenuItem>
-					<Divider />
-
-					<RMenuItem
-						className="left-menu-list"
-						onClick={(e) => {
-							// keyInfo.rename(this.selectedNodeID);
-							this.closeMenu();
-							this.openPopper(e);
-						}}
-					>
-						<Button size="small" className="secondary-color">
-							rename
-						</Button>
-					</RMenuItem>
-					<Divider />
-
-					<RMenuItem
-						className="eft-menu-list"
-						onClick={() => {
-							var n = this.findNode(this.selectedNodeID);
-							if (!n) return;
-							keyInfo.delete(n);
-							this.closeMenu();
-						}}
-					>
-						<Button size="small" className="error-color">
-							delete
-						</Button>
-					</RMenuItem>
-				</RMenu>
+				{Popper(this)}
+				{Menu(this)}
 			</div>
 		);
 	}
@@ -659,9 +456,10 @@ class Left extends Component {
 			return;
 		}
 
-		var map = {};
-		for (var i = 0; i < node.parent.children.length; i++) {
-			map[node.parent.children[i].id] = { i: i, v: false };
+		if (this.inSearch) {
+			this.startSearch();
+			this.renderSearch(0);
+			return;
 		}
 
 		var { parent, data, page, limit } = await this.getNodes(node.parent, node.parent.path, 1);
@@ -669,6 +467,11 @@ class Left extends Component {
 		// merge node parent and data
 		if (!data) {
 			data = [];
+		}
+
+		var map = {};
+		for (var i = 0; i < node.parent.children.length; i++) {
+			map[node.parent.children[i].id] = { i: i, v: false };
 		}
 
 		// add
@@ -696,9 +499,13 @@ class Left extends Component {
 		// remove
 		for (const id in map) {
 			if (map[id].v == false) {
-				node.parent.children.splice(map[id].i, 1);
+				node.parent.children[map[id].i].path = "";
 			}
 		}
+
+		node.parent.children = node.parent.children.filter((el) => el.path != "");
+
+		node.parent.children.sort((a, b) => a.name.localeCompare(b.name));
 
 		if (node.parent.children.length === limit) {
 			node.parent.children.push({
@@ -714,9 +521,43 @@ class Left extends Component {
 			});
 		}
 
-		node.parent.children.sort((a, b) => a.name.localeCompare(b.name));
-
 		this.setState({ data: this.state.data });
+	}
+
+	temp = [];
+	iter = 0;
+	inSearch = false;
+	searchInput = React.createRef();
+
+	async renderSearch(iter) {
+		this.iter = iter;
+		var res = await Api.scan(this.searchValue, this.iter, this.limit);
+		this.iter = res.msg.iter;
+		this.renderNode(this.state.data, res.msg.data || [], 1, this.limit);
+	}
+
+	async startSearch() {
+		if (!this.searchValue) return;
+
+		if (!this.inSearch) {
+			this.temp = this.state.data.children;
+		}
+		this.iter = 0;
+		this.state.data.children = [];
+		this.inSearch = true;
+
+		this.setState({ openSearch: true });
+	}
+
+	exitSearch() {
+		this.searchValue = "";
+		this.searchInput.current.querySelector("input").value = "";
+		this.state.data.children = this.temp;
+		this.temp = [];
+		this.iter = 0;
+		this.inSearch = false;
+
+		this.setState({ openSearch: false });
 	}
 }
 

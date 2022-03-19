@@ -66,6 +66,13 @@ const Api = {
 		this.queryLog(cmd, res);
 		return data;
 	},
+
+	async scan(search, iter, limit) {
+		let res = await axios.get(`${this.http}/scan`, { limit: limit, search: search, iter: iter });
+		var data = res.data;
+		this.queryLog(["SCAN", iter, search, limit], res);
+		return data;
+	},
 };
 
 export default Api;

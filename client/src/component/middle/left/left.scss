@@ -48,16 +48,6 @@
 				height: calc(100% - 36px - 36px);
 				width: 100%;
 				overflow: auto;
-
-				.item-desc {
-					outline: none;
-					width: 100%;
-					height: 100%;
-					display: flex;
-					justify-content: flex-start;
-					align-items: center;
-					padding-left: 2px;
-				}
 			}
 
 			> .bottom {
@@ -75,12 +65,25 @@
 						height: 36px;
 						width: 100%;
 						padding: 0 5px;
-						.search-icon {
-							margin-right: 5px;
+
+						> div {
+							display: flex;
+							justify-content: center;
+							align-items: flex-end;
+							// width: 100px;
+							height: 100%;
+							margin-bottom: 5px;
 						}
 
-						.refresh-icon {
+						.search-icon {
+							margin-right: 5px;
+							margin-left: 15px;
+							font-size: 22px;
+						}
+
+						.close-icon {
 							margin-right: 0px;
+							font-size: 22px;
 						}
 					}
 				}

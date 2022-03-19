@@ -38,7 +38,7 @@ var keyInfo = {
 		});
 	},
 
-	rename: (node, changePath, openRight = true) => {
+	rename: (node, changePath, openRight = true, closeRight = true) => {
 		Comfirm.open({
 			width: "400px",
 			height: "100px",
@@ -58,7 +58,7 @@ var keyInfo = {
 							var cmd = ["RENAME", node.path, changePath];
 							let res = await Api.do(cmd);
 							if (res.msg == "OK") {
-								event.emitComponent(Right, "right-closeKey", node);
+								closeRight && event.emitComponent(Right, "right-closeKey", node);
 								event.emitComponent(Left, "left-rename", { ...node, changePath: changePath });
 								openRight && event.emitComponent(Right, "right-activeKey", { ...node, path: changePath });
 								message.success("rename success");
