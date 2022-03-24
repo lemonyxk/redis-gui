@@ -8,6 +8,7 @@ const themes = require("../../theme/theme.json");
 import store from "../../tools/store";
 import { Comfirm } from "../../common/comfirm";
 import event from "../../tools/event";
+import Api from "../../tools/api";
 
 class Cli {
 	openCli() {
@@ -57,10 +58,10 @@ class Cli {
 			document.title = title;
 		});
 
-		var dom = document.getElementById("terminal-container");
+		let dom = document.getElementById("terminal-container");
 		term.open(dom);
 
-		const socket = new WebSocket(`ws://127.0.0.1:8669?token=${store.get("token")}&uuid=${store.get("uuid")}`);
+		const socket = new WebSocket(`${Api.ws}/pty?token=${store.get("token")}&uuid=${store.get("uuid")}`);
 		const attachAddon = new AttachAddon(socket);
 		term.loadAddon(attachAddon);
 
@@ -73,7 +74,7 @@ class Cli {
 			this.term.focus();
 			this.t = setInterval(() => {
 				this.socket.send("");
-			}, 1000);
+			}, 3000);
 		};
 
 		event.add("resize", this.bindResize);

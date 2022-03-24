@@ -29,6 +29,7 @@ class Socket {
 		// Global
 		this.Global = {};
 		// StartTimes
+		this.before = null;
 		this.StartTimes = 0;
 		this.OnError = null;
 		this.OnClose = null;
@@ -44,6 +45,7 @@ class Socket {
 		this.callback = null;
 		this.event = null;
 		this.status = false;
+		this.before = null;
 		this.Global = null;
 		this.Config = null;
 		this.OnError = null;
@@ -70,7 +72,7 @@ class Socket {
 		// 连接WS服务器
 		// NODE
 		if (typeof module !== "undefined" && module.exports) {
-			var W3CWebSocket = require("websocket").w3cwebsocket;
+			let W3CWebSocket = require("websocket").w3cwebsocket;
 			this.server = new W3CWebSocket(addr);
 		} else {
 			this.server = new WebSocket(addr);
@@ -105,11 +107,25 @@ class Socket {
 		try {
 			let message = JSON.parse(e.data);
 
-			if (message.event && message.event in this.event) {
-				this.event[message.event].call(this, this, message.data, message.event);
+			if (message.id) {
+				if (this.promiseList[message.id]) {
+					if (this.promiseList[message.id].visit == false) {
+						this.promiseList[message.id].visit = true;
+						clearTimeout(this.promiseList[message.id].timeout);
+						this.promiseList[message.id].resolve(message);
+						delete this.promiseList[message.id];
+						return;
+					}
+				}
 			}
 
-			if (this.event["*"]) this.event["*"].call(this, this, message.data, message.event);
+			if (message.event && message.event in this.event) {
+				return this.event[message.event].call(this, this, message.data, message.event);
+			}
+
+			if (this.event["*"]) {
+				return this.event["*"].call(this, this, message.data, message.event);
+			}
 		} catch (error) {
 			console.log("socket错误:", error);
 		}
@@ -164,6 +180,8 @@ class Socket {
 	}
 
 	Emit(event, message) {
+		this.before && this.before();
+
 		// 发送消息事件
 		if (this.nologin || this.error || !this.status) return false;
 
@@ -199,6 +217,51 @@ class Socket {
 	RemoveListener(event) {
 		// 监听事件
 		this.event && delete this.event[event];
+	}
+
+	messageID = 0;
+	promiseList = {};
+	async Do(event, message) {
+		// 发送消息事件
+
+		this.before && this.before();
+
+		return new Promise((resolve, reject) => {
+			if (this.nologin || this.error || !this.status) {
+				reject("not connect");
+				return;
+			}
+
+			this.messageID++;
+			this.promiseList[this.messageID] = { resolve, timeout: null, visit: false };
+
+			try {
+				if (!message) {
+					this.server.send(JSON.stringify({ event: event, id: this.messageID }));
+					return;
+				}
+
+				let data = null;
+				if (typeof message !== "object") {
+					data = message;
+				} else {
+					data = { ...message, ...this.Global };
+				}
+
+				this.server.send(JSON.stringify({ event: event, data: data, id: this.messageID }));
+				return;
+			} catch (error) {
+				reject(error);
+				return;
+			} finally {
+				this.promiseList[this.messageID].timeout = setTimeout(() => {
+					this.promiseList[this.messageID].visit = true;
+					clearTimeout(this.promiseList[this.messageID].timeout);
+					delete this.promiseList[this.messageID];
+					reject("timeout");
+				}, 1000 * this.Config.timeout || 5000);
+			}
+		});
 	}
 }
 

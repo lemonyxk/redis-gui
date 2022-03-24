@@ -35,6 +35,7 @@ class Add extends Component {
 							value={this.state.name}
 							onChange={(e) => this.setState({ name: e.target.value })}
 							autoComplete="off"
+							spellCheck="false"
 						/>
 					</FormControl>
 				</div>
@@ -74,6 +75,7 @@ class Add extends Component {
 							value={this.state.masterName}
 							onChange={(e) => this.setState({ masterName: e.target.value })}
 							autoComplete="off"
+							spellCheck="false"
 						/>
 					</FormControl>
 				</div>
@@ -100,6 +102,7 @@ class Add extends Component {
 											this.setState({ addr: this.state.addr });
 										}}
 										autoComplete="off"
+										spellCheck="false"
 									/>
 								</FormControl>
 								<FormControl fullWidth style={{ width: "30%", height: 48 }}>
@@ -116,6 +119,7 @@ class Add extends Component {
 											this.setState({ addr: this.state.addr });
 										}}
 										autoComplete="off"
+										spellCheck="false"
 									/>
 								</FormControl>
 								<div className="addr-delete" onClick={() => this.removeAddr(index)}>
@@ -138,6 +142,7 @@ class Add extends Component {
 							value={this.state.password}
 							onChange={(e) => this.setState({ password: e.target.value })}
 							autoComplete="off"
+							spellCheck="false"
 						/>
 					</FormControl>
 				</div>
@@ -154,6 +159,7 @@ class Add extends Component {
 							value={this.state.split}
 							onChange={(e) => this.setState({ split: e.target.value })}
 							autoComplete="off"
+							spellCheck="false"
 						/>
 					</FormControl>
 				</div>
@@ -170,6 +176,7 @@ class Add extends Component {
 							value={this.state.db}
 							onChange={(e) => this.setState({ db: e.target.value })}
 							autoComplete="off"
+							spellCheck="false"
 						/>
 					</FormControl>
 				</div>

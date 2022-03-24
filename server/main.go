@@ -15,7 +15,6 @@ import (
 
 	"github.com/lemoyxk/console"
 	"github.com/lemoyxk/utils"
-	"server/http"
 	"server/websocket"
 )
 
@@ -23,7 +22,7 @@ func main() {
 
 	websocket.Start()
 
-	http.Start()
+	// http.Start()
 
 	websocket.PTY()
 

@@ -63,8 +63,8 @@ class ZSet extends Component {
 		this.state.res = [];
 		let res = await Api.do(["ZRANGE", key, this.limit * (this.page - 1), this.limit * this.page - 1, "WITHSCORES"]);
 		for (let i = 0; i < res.msg.length; i += 2) {
-			var value = res.msg[i];
-			var score = res.msg[i + 1];
+			let value = res.msg[i];
+			let score = res.msg[i + 1];
 			score = String(parseFloat(score));
 			this.state.res.push({ value, score });
 		}
@@ -189,6 +189,7 @@ class ZSet extends Component {
 												onChange={(e) => this.setState({ page: e.target.value })}
 												onBlur={(e) => this.changePage(e.target.value)}
 												autoComplete="off"
+												spellCheck="false"
 											/>
 											<Button className="forward" size="small" onClick={() => this.forward()}>
 												<ArrowForwardIosIcon style={{ width: 18 }}></ArrowForwardIosIcon>
@@ -230,7 +231,7 @@ class ZSet extends Component {
 						autoFocus
 						onClick={async () => {
 							// delete zset key
-							var cmd = ["zrem", this.props.path, this.state.selectValue];
+							let cmd = ["zrem", this.props.path, this.state.selectValue];
 							await Api.do(cmd);
 							if (this.state.size == 1) {
 								event.emitComponent(Left, "left-refresh", this.props.data);
@@ -251,8 +252,8 @@ class ZSet extends Component {
 	}
 
 	addRow() {
-		var addRowScore = "";
-		var addRowValue = "";
+		let addRowScore = "";
+		let addRowValue = "";
 
 		Comfirm.open({
 			width: "400px",
@@ -269,6 +270,7 @@ class ZSet extends Component {
 						defaultValue={addRowScore}
 						onChange={(e) => (addRowScore = e.target.value)}
 						autoComplete="off"
+						spellCheck="false"
 					/>
 					<Input
 						className="add-row-value"
@@ -279,6 +281,7 @@ class ZSet extends Component {
 						defaultValue={addRowValue}
 						onChange={(e) => (addRowValue = e.target.value)}
 						autoComplete="off"
+						spellCheck="false"
 					/>
 				</div>
 			),
@@ -292,14 +295,14 @@ class ZSet extends Component {
 			),
 		});
 
-		var cancel = () => {
+		let cancel = () => {
 			Comfirm.close();
 		};
 
-		var submit = async () => {
+		let submit = async () => {
 			// zset add row
-			var cmd = ["zadd", this.props.path, addRowScore, addRowValue];
-			var res = await Api.do(cmd);
+			let cmd = ["zadd", this.props.path, addRowScore, addRowValue];
+			let res = await Api.do(cmd);
 			if (res.code != 200) {
 				message.error(res.msg);
 			} else {
@@ -312,8 +315,8 @@ class ZSet extends Component {
 	}
 
 	async saveZSet() {
-		var score = this.state.selectScore;
-		var value = this.state.selectValue;
+		let score = this.state.selectScore;
+		let value = this.state.selectValue;
 
 		if (!score.match(/[+-]?([0-9]*[.])?[0-9]+/) || isNaN(score)) {
 			return message.error("score must be a number");
@@ -321,19 +324,19 @@ class ZSet extends Component {
 
 		score = String(parseFloat(score));
 
-		var oldValue = this.state.res[this.selectIndex].value;
-		var oldScore = this.state.res[this.selectIndex].score;
+		let oldValue = this.state.res[this.selectIndex].value;
+		let oldScore = this.state.res[this.selectIndex].score;
 		if (oldValue == value && oldScore == score) {
 			return message.error("no change");
 		}
 
 		if (value != oldValue) {
 			// remove
-			var cmd = ["zrem", this.props.path, oldValue];
+			let cmd = ["zrem", this.props.path, oldValue];
 			await Api.do(cmd);
 		}
 
-		var cmd = ["zadd", this.props.path, score, value];
+		let cmd = ["zadd", this.props.path, score, value];
 		await Api.do(cmd);
 
 		this.state.res[this.selectIndex].value = value;
@@ -395,7 +398,7 @@ class ZSet extends Component {
 
 	renderItem = (value, height) => {
 		if (value.index > this.state.res.length - 1) return;
-		var classList = ["v-list-item"];
+		let classList = ["v-list-item"];
 		if (this.selectIndex > this.state.res.length - 1) {
 			this.selectIndex = this.state.res.length - 1;
 		}

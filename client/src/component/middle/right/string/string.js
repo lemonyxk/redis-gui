@@ -30,7 +30,7 @@ class String extends Component {
 	}
 
 	async getSize(key) {
-		var size = this.state.res.length;
+		let size = this.state.res.length;
 		this.setState({ size: size });
 	}
 

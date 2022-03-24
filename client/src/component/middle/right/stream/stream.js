@@ -72,12 +72,12 @@ class Stream extends Component {
 		this.state.res = [];
 
 		if (this.cache[this.page]) {
-			var res = this.cache[this.page];
+			let res = this.cache[this.page];
 			for (let i = 0; i < res.length; i++) {
-				var data = res[i];
-				var id = data[0];
-				var key = data[1][0];
-				var value = data[1][1];
+				let data = res[i];
+				let id = data[0];
+				let key = data[1][0];
+				let value = data[1][1];
 				this.state.res.push({ id, key, value });
 			}
 		} else {
@@ -86,12 +86,12 @@ class Stream extends Component {
 			if (res.msg.length > this.limit) {
 				res.msg = res.msg.slice(0, res.msg.length - 1);
 			}
-			var cache = [];
+			let cache = [];
 			for (let i = 0; i < res.msg.length; i++) {
-				var data = res.msg[i];
-				var id = data[0];
-				var key = data[1][0];
-				var value = data[1][1];
+				let data = res.msg[i];
+				let id = data[0];
+				let key = data[1][0];
+				let value = data[1][1];
 				cache.push(data);
 				this.state.res.push({ id, key, value });
 			}
@@ -224,6 +224,7 @@ class Stream extends Component {
 												onChange={(e) => this.setState({ page: e.target.value })}
 												onBlur={(e) => this.changePage(e.target.value)}
 												autoComplete="off"
+												spellCheck="false"
 											/>
 											<Button className="forward" size="small" onClick={() => this.forward()}>
 												<ArrowForwardIosIcon style={{ width: 18 }}></ArrowForwardIosIcon>
@@ -263,10 +264,10 @@ class Stream extends Component {
 						onClick={async () => {
 							// delete stream key
 							// XDEL my-stream 1647358926226-0
-							var cmd = ["XDEL", this.props.path, this.state.selectID];
+							let cmd = ["XDEL", this.props.path, this.state.selectID];
 							await Api.do(cmd);
 							if (this.state.size == 1) {
-								var cmd = ["DEL", this.props.path];
+								let cmd = ["DEL", this.props.path];
 								await Api.do(cmd);
 								event.emitComponent(Left, "left-refresh", this.props.data);
 								event.emitComponent(Right, "right-closeKey", this.props.data);
@@ -287,9 +288,9 @@ class Stream extends Component {
 	}
 
 	addRow() {
-		var addRowID = "*";
-		var addRowkey = "";
-		var addRowValue = "";
+		let addRowID = "*";
+		let addRowkey = "";
+		let addRowValue = "";
 
 		Comfirm.open({
 			width: "400px",
@@ -306,6 +307,7 @@ class Stream extends Component {
 						defaultValue={addRowID}
 						onChange={(e) => (addRowID = e.target.value)}
 						autoComplete="off"
+						spellCheck="false"
 					/>
 					<Input
 						className="add-row-key"
@@ -316,6 +318,7 @@ class Stream extends Component {
 						defaultValue={addRowkey}
 						onChange={(e) => (addRowkey = e.target.value)}
 						autoComplete="off"
+						spellCheck="false"
 					/>
 					<Input
 						className="add-row-value"
@@ -326,6 +329,7 @@ class Stream extends Component {
 						defaultValue={addRowValue}
 						onChange={(e) => (addRowValue = e.target.value)}
 						autoComplete="off"
+						spellCheck="false"
 					/>
 				</div>
 			),
@@ -339,15 +343,15 @@ class Stream extends Component {
 			),
 		});
 
-		var cancel = () => {
+		let cancel = () => {
 			Comfirm.close();
 		};
 
-		var submit = async () => {
+		let submit = async () => {
 			// stream add row
 			//  XADD my-stream * a 1
-			var cmd = ["XADD", this.props.path, addRowID, addRowkey, addRowValue];
-			var res = await Api.do(cmd);
+			let cmd = ["XADD", this.props.path, addRowID, addRowkey, addRowValue];
+			let res = await Api.do(cmd);
 			if (res.code != 200) {
 				message.error(res.msg);
 			} else {
@@ -402,7 +406,7 @@ class Stream extends Component {
 
 	renderItem = (value, height) => {
 		if (value.index > this.state.res.length - 1) return;
-		var classList = ["v-list-item"];
+		let classList = ["v-list-item"];
 		if (this.selectIndex > this.state.res.length - 1) {
 			this.selectIndex = this.state.res.length - 1;
 		}

@@ -6,7 +6,7 @@ class Event {
 			this.eventList[name] = [];
 		}
 
-		var index = this.eventList[name].indexOf(fn);
+		let index = this.eventList[name].indexOf(fn);
 		if (index == -1) {
 			this.eventList[name].push(fn);
 		}
@@ -16,7 +16,7 @@ class Event {
 		if (!this.eventList[name]) {
 			return;
 		}
-		var index = this.eventList[name].indexOf(fn);
+		let index = this.eventList[name].indexOf(fn);
 		if (index > -1) {
 			this.eventList[name].splice(index, 1);
 		}
@@ -25,9 +25,9 @@ class Event {
 	emit = (name, data, fn) => {
 		if (!this.eventList[name]) return;
 
-		for (var i = 0; i < this.eventList[name].length; i++) {
+		for (let i = 0; i < this.eventList[name].length; i++) {
 			if (this.eventList[name][i]) {
-				var res = this.eventList[name][i].call(this, data);
+				let res = this.eventList[name][i].call(this, data);
 				fn && fn(res);
 			}
 		}
@@ -50,7 +50,7 @@ class Event {
 	emitComponent = (component, name, data, fn) => {
 		if (!this.componentList[component]) return;
 		if (!this.componentList[component][name]) return;
-		var res = this.componentList[component][name].call(this, data);
+		let res = this.componentList[component][name].call(this, data);
 		fn && fn(res);
 	};
 }

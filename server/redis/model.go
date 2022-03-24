@@ -38,7 +38,7 @@ type CR interface {
 }
 
 type Run interface {
-	Do(ctx context.Context, args ...interface{}) *redis.Cmd
+	Do(ctx context.Context, args ...any) *redis.Cmd
 	PSubscribe(ctx context.Context, channels ...string) *redis.PubSub
 }
 

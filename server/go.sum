@@ -94,6 +94,8 @@ github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
 github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
+github.com/lemonyxk/structure/v3 v3.0.1-0.20220321181107-4b0496fa833b h1:GFDZmotWyJrU1AU+S7bQoRSXMwzxhDePEBHsyeCZ8CE=
+github.com/lemonyxk/structure/v3 v3.0.1-0.20220321181107-4b0496fa833b/go.mod h1:bwQ0G4J3djDlgKyOFLVVr4xJByWAO3XMDExZhdCG6ls=
 github.com/lemoyxk/caller v0.0.0-20210923041650-ed223e41b72c/go.mod h1:J+iyY3zK37N8XualW5SB5DZmOgyffgs4P42M1jL9j8s=
 github.com/lemoyxk/caller v0.0.0-20211111155840-a4a8dd35a4dd h1:NajbEzhJJgDhjvjbGyBqCtaVb7jiWLbTYak19gWQiGg=
 github.com/lemoyxk/caller v0.0.0-20211111155840-a4a8dd35a4dd/go.mod h1:nAwsXLpCFNBVouInY/Bu0HQ08JkAuwAITXtoz2hhYU4=
@@ -101,6 +103,8 @@ github.com/lemoyxk/console v0.0.0-20220210101750-ec7eacfbe325 h1:rBVlxamZl3jqRYQ
 github.com/lemoyxk/console v0.0.0-20220210101750-ec7eacfbe325/go.mod h1:iWtz6rq2BTMlS87MDF8tKm2VdXPDfba98MGjUSKGWHo=
 github.com/lemoyxk/kitty/v2 v2.0.0-20220313090808-ce0124dc81b0 h1:xMGS32S+VFuc7IHpru6ktSbPTxGWt7rM/F8stDD3FRU=
 github.com/lemoyxk/kitty/v2 v2.0.0-20220313090808-ce0124dc81b0/go.mod h1:ocdyZw+yKreEoKXUde/7ZworNwFwksCOHPB3LD+29JY=
+github.com/lemoyxk/kitty/v2 v2.0.0-20220320180520-6c5a3e6338e2 h1:KPJUt4GUBNyGvbJKSdrlmNpMDhjNcocI4+rbU73RMr8=
+github.com/lemoyxk/kitty/v2 v2.0.0-20220320180520-6c5a3e6338e2/go.mod h1:ocdyZw+yKreEoKXUde/7ZworNwFwksCOHPB3LD+29JY=
 github.com/lemoyxk/structure v0.0.0-20211220180515-361786807cb4 h1:yzrEpMJT752bRw3oIHvRBC+aoFmRR+F9INwDwIn9zjQ=
 github.com/lemoyxk/structure v0.0.0-20211220180515-361786807cb4/go.mod h1:6wa1hiSaOkYK9yRlcuyVrOloR08el20aQiT/OefwwsY=
 github.com/lemoyxk/utils v1.0.0 h1:ladcLEjLd2kilk6eK4A0qdPUgis6pG+KaoFUO3JXu2g=

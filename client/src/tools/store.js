@@ -1,4 +1,11 @@
-const store = require("store");
+let store = require("store");
+
+let userAgent = navigator.userAgent.toLowerCase();
+if (userAgent.indexOf(" electron/") > -1) {
+	const Store = window.require("electron-store");
+	store = new Store();
+	store.remove = store.delete;
+}
 
 class Store {
 	appName = "__redis-client__";

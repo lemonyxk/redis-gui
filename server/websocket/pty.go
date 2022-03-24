@@ -12,44 +12,17 @@ package websocket
 
 import (
 	"encoding/json"
+	http2 "net/http"
 	"os"
 	"runtime"
-	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/lemoyxk/console"
-	kitty2 "github.com/lemoyxk/kitty/v2"
 	"github.com/lemoyxk/kitty/v2/http"
-	"github.com/lemoyxk/kitty/v2/socket/websocket/server"
 	pty "github.com/runletapp/go-console"
 	"server/app"
 )
-
-var ptyMap = PtyMap{data: make(map[int64]pty.Console)}
-
-type PtyMap struct {
-	data map[int64]pty.Console
-	mux  sync.RWMutex
-}
-
-func (p *PtyMap) Get(key int64) pty.Console {
-	p.mux.RLock()
-	defer p.mux.RUnlock()
-	return p.data[key]
-}
-
-func (p *PtyMap) Set(key int64, value pty.Console) {
-	p.mux.Lock()
-	defer p.mux.Unlock()
-	p.data[key] = value
-}
-
-func (p *PtyMap) Delete(key int64) {
-	p.mux.Lock()
-	defer p.mux.Unlock()
-	delete(p.data, key)
-}
 
 type Size struct {
 	Cols int `json:"cols"`
@@ -58,44 +31,47 @@ type Size struct {
 
 func PTY() {
 
-	var ws = &app.WebSocket{}
-	ws.Addr = "127.0.0.1:8669"
+	app.Server.OnRaw = func(w http2.ResponseWriter, r *http2.Request) {
 
-	var webSocketServerRouter = kitty2.NewWebSocketServerRouter()
+		var upgrade = websocket.Upgrader{
+			HandshakeTimeout: time.Second * 2,
+			ReadBufferSize:   4096,
+			WriteBufferSize:  4096,
+			CheckOrigin: func(r *http2.Request) bool {
+				return true
+			},
+		}
 
-	Router(webSocketServerRouter)
+		conn, err := upgrade.Upgrade(w, r, nil)
+		if err != nil {
+			console.Error(err)
+			return
+		}
 
-	ws.OnOpen = func(conn *server.Conn) {
+		defer func() { _ = conn.Close() }()
 
-		var stream = http.NewStream(conn.Response, conn.Request)
+		var stream = http.NewStream(w, r)
 		stream.ParseQuery()
 
 		var token = stream.Query.First("token").String()
 		var uuid = stream.Query.First("uuid").String()
 		if token == "" || uuid == "" {
-			_ = conn.Close()
 			return
 		}
 
 		var client = app.Connections.Get(uuid)
 		if client == nil {
-			_ = conn.Close()
 			return
 		}
 
 		if client.Token != token {
-			_ = conn.Close()
 			return
 		}
 
-		var p = ptyMap.Get(conn.FD)
-		if p == nil {
-			var proc, err = pty.New(80, 24)
-			if err != nil {
-				panic(err)
-			}
-			p = proc
-			ptyMap.Set(conn.FD, proc)
+		proc, err := pty.New(80, 24)
+		if err != nil {
+			console.Error(err)
+			return
 		}
 
 		var args []string
@@ -107,66 +83,40 @@ func PTY() {
 			args = []string{"/bin/bash", "-c", "$SHELL -l"}
 		}
 
-		_ = p.SetENV(append(os.Environ(), "TERM=xterm"))
+		_ = proc.SetENV(append(os.Environ(), "TERM=xterm"))
 
-		if err := p.Start(args); err != nil {
-			panic(err)
+		if err := proc.Start(args); err != nil {
+			console.Error(err)
+			return
 		}
 
 		go func() {
 			for {
 				buf := make([]byte, 1024)
-				read, err := p.Read(buf)
+				read, err := proc.Read(buf)
 				if err != nil {
 					return
 				}
-				_ = conn.Conn.WriteMessage(websocket.BinaryMessage, buf[:read])
+				_ = conn.WriteMessage(websocket.BinaryMessage, buf[:read])
 			}
 		}()
 
-	}
+		for {
+			_, buf, err := conn.ReadMessage()
+			if err != nil {
+				console.Info("pty close")
+				return
+			}
 
-	ws.OnClose = func(conn *server.Conn) {
-		var p = ptyMap.Get(conn.FD)
-		if p == nil {
-			return
-		}
-		_ = p.Close()
-		ptyMap.Delete(conn.FD)
-		console.Info(conn.FD, "pty close")
-	}
+			var size Size
 
-	ws.OnUnknown = func(conn *server.Conn, message []byte, next server.Middle) {
+			err = json.Unmarshal(buf, &size)
+			if err == nil {
+				_ = proc.SetSize(size.Cols, size.Rows)
+				continue
+			}
 
-		if len(message) == 0 {
-			return
-		}
-
-		var size Size
-
-		var p = ptyMap.Get(conn.FD)
-		if p == nil {
-			return
-		}
-
-		var err = json.Unmarshal(message, &size)
-		if err == nil {
-			_ = p.SetSize(size.Cols, size.Rows)
-			return
-		}
-
-		_, _ = p.Write(message)
-	}
-
-	ws.PingHandler = func(conn *server.Conn) func(appData string) error {
-		return func(appData string) error {
-			return conn.Conn.SetReadDeadline(time.Now().Add(ws.HeartBeatTimeout))
+			_, _ = proc.Write(buf)
 		}
 	}
-
-	ws.OnSuccess = func() {
-		console.Info("websocket server start success", app.Server.Addr)
-	}
-
-	go ws.SetRouter(webSocketServerRouter).Start()
 }

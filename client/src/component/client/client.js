@@ -64,7 +64,7 @@ class ClientLine extends Component {
 	chart = null;
 
 	componentDidMount() {
-		var chartDom = document.getElementById("client");
+		let chartDom = document.getElementById("client");
 		this.chart = echarts.init(chartDom);
 		this.chart.setOption(this.option);
 	}
@@ -94,11 +94,11 @@ class Client {
 	}
 
 	infoAll(e, data) {
-		var res = [];
+		let res = [];
 
 		for (let i = 0; i < data.msg.length; i++) {
 			const element = data.msg[i];
-			var r = JSON.parse(element);
+			let r = JSON.parse(element);
 			res.push({
 				time: r.Time,
 				connected_clients: r.Clients.connected_clients,

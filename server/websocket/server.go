@@ -23,6 +23,7 @@ func Start() {
 
 	app.Server = &app.WebSocket{}
 	app.Server.Addr = "127.0.0.1:8667"
+	app.Server.Path = "/ws"
 
 	var webSocketServerRouter = kitty2.NewWebSocketServerRouter()
 

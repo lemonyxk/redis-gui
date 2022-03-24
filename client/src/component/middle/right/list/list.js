@@ -62,7 +62,7 @@ class List extends Component {
 		this.state.res = [];
 		let res = await Api.do(["LRANGE", key, this.limit * (this.page - 1), this.limit * this.page - 1]);
 		for (let i = 0; i < res.msg.length; i++) {
-			var value = res.msg[i];
+			let value = res.msg[i];
 			this.state.res.push({ value });
 		}
 		if (this.selectIndex > this.state.res.length - 1) {
@@ -177,6 +177,7 @@ class List extends Component {
 												onChange={(e) => this.setState({ page: e.target.value })}
 												onBlur={(e) => this.changePage(e.target.value)}
 												autoComplete="off"
+												spellCheck="false"
 											/>
 											<Button className="forward" size="small" onClick={() => this.forward()}>
 												<ArrowForwardIosIcon style={{ width: 18 }}></ArrowForwardIosIcon>
@@ -218,9 +219,9 @@ class List extends Component {
 						autoFocus
 						onClick={async () => {
 							// delete list key
-							var random = "__TEMP_REMOVE_FLAG__WITH_LEMON__";
-							var index = (this.page - 1) * this.limit + this.selectIndex;
-							var cmd = ["LSET", this.props.path, index, random];
+							let random = "__TEMP_REMOVE_FLAG__WITH_LEMON__";
+							let index = (this.page - 1) * this.limit + this.selectIndex;
+							let cmd = ["LSET", this.props.path, index, random];
 							await Api.do(cmd);
 							cmd = ["LREM", this.props.path, 0, random];
 							await Api.do(cmd);
@@ -243,7 +244,7 @@ class List extends Component {
 	}
 
 	addRow() {
-		var addRowValue = "";
+		let addRowValue = "";
 
 		Comfirm.open({
 			width: "400px",
@@ -260,6 +261,7 @@ class List extends Component {
 						defaultValue={addRowValue}
 						onChange={(e) => (addRowValue = e.target.value)}
 						autoComplete="off"
+						spellCheck="false"
 					/>
 				</div>
 			),
@@ -273,14 +275,14 @@ class List extends Component {
 			),
 		});
 
-		var cancel = () => {
+		let cancel = () => {
 			Comfirm.close();
 		};
 
-		var submit = async () => {
+		let submit = async () => {
 			// list add row
-			var cmd = ["LPUSH", this.props.path, addRowValue];
-			var res = await Api.do(cmd);
+			let cmd = ["LPUSH", this.props.path, addRowValue];
+			let res = await Api.do(cmd);
 			if (res.code != 200) {
 				message.error(res.msg);
 			} else {
@@ -293,15 +295,15 @@ class List extends Component {
 	}
 
 	async saveList() {
-		var value = this.state.selectValue;
+		let value = this.state.selectValue;
 
-		var oldValue = this.state.res[this.selectIndex].value;
+		let oldValue = this.state.res[this.selectIndex].value;
 		if (oldValue == value) {
 			return message.error("no change");
 		}
 
-		var index = (this.page - 1) * this.limit + this.selectIndex;
-		var cmd = ["LSET", this.props.path, index, value];
+		let index = (this.page - 1) * this.limit + this.selectIndex;
+		let cmd = ["LSET", this.props.path, index, value];
 		await Api.do(cmd);
 
 		this.state.res[this.selectIndex].value = value;
@@ -358,7 +360,7 @@ class List extends Component {
 
 	renderItem = (value, height) => {
 		if (value.index > this.state.res.length - 1) return;
-		var classList = ["v-list-item"];
+		let classList = ["v-list-item"];
 		if (this.selectIndex > this.state.res.length - 1) {
 			this.selectIndex = this.state.res.length - 1;
 		}

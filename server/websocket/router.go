@@ -15,10 +15,16 @@ import (
 )
 
 func Router(router *server.Router) {
-	router.Group().Handler(func(handler *server.RouteHandler) {
-		handler.Route("/login").Handler(Login)
+	router.Group().Before(Before).Handler(func(handler *server.RouteHandler) {
+		handler.Route("/login").PassBefore().Handler(Login)
 
-		handler.Route("/infoAll").Before(Before).Handler(InfoAll)
-		handler.Route("/closeInfoAll").Before(Before).Handler(CloseInfoAll)
+		handler.Route("/infoAll").Handler(InfoAll)
+		handler.Route("/closeInfoAll").Handler(CloseInfoAll)
+
+		handler.Route("/list").Handler(List)
+		handler.Route("/db").Handler(DB)
+		handler.Route("/scan").Handler(Scan)
+		handler.Route("/type").Handler(Type)
+		handler.Route("/do").Handler(Do)
 	})
 }

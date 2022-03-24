@@ -72,7 +72,7 @@ class NetWorkLine extends Component {
 	chart = null;
 
 	componentDidMount() {
-		var chartDom = document.getElementById("network");
+		let chartDom = document.getElementById("network");
 		this.chart = echarts.init(chartDom);
 		this.chart.setOption(this.option);
 	}
@@ -102,11 +102,11 @@ class NetWork {
 	}
 
 	infoAll(e, data) {
-		var res = [];
+		let res = [];
 
 		for (let i = 0; i < data.msg.length; i++) {
 			const element = data.msg[i];
-			var r = JSON.parse(element);
+			let r = JSON.parse(element);
 			res.push({
 				time: r.Time,
 				instantaneous_input_kbps: r.Stats.instantaneous_input_kbps,

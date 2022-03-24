@@ -75,22 +75,22 @@ class Set extends Component {
 		if (this.cache[this.page]) {
 			this.state.res = [];
 
-			var data = [...this.cache[this.page]];
+			let data = [...this.cache[this.page]];
 
 			for (let i = 0; i < data.length; i++) {
-				var value = data[i];
+				let value = data[i];
 				this.state.res.push({ value });
 			}
 		} else {
 			if (this.iter == 0 && this.page != 1) {
 				this.state.res = [];
 
-				var data = [...this.overage];
+				let data = [...this.overage];
 				this.overage = [];
 
-				var cache = [];
+				let cache = [];
 				for (let i = 0; i < data.length; i++) {
-					var value = data[i];
+					let value = data[i];
 					if (this.state.res.length >= this.limit) {
 						this.overage.push(value);
 					} else {
@@ -103,17 +103,17 @@ class Set extends Component {
 			} else {
 				this.state.res = [];
 
-				var data = [...this.overage];
+				let data = [...this.overage];
 
 				this.overage = [];
 
-				var res = await Api.do(["SSCAN", key, this.iter, "COUNT", this.limit]);
+				let res = await Api.do(["SSCAN", key, this.iter, "COUNT", this.limit]);
 				this.iter = res.msg[0];
 				data.push(...res.msg[1]);
 
-				var cache = [];
+				let cache = [];
 				for (let i = 0; i < data.length; i++) {
-					var value = data[i];
+					let value = data[i];
 					if (this.state.res.length >= this.limit) {
 						this.overage.push(value);
 					} else {
@@ -239,6 +239,7 @@ class Set extends Component {
 												onChange={(e) => this.setState({ page: e.target.value })}
 												onBlur={(e) => this.changePage(e.target.value)}
 												autoComplete="off"
+												spellCheck="false"
 											/>
 											<Button className="forward" size="small" onClick={() => this.forward()}>
 												<ArrowForwardIosIcon style={{ width: 18 }}></ArrowForwardIosIcon>
@@ -280,7 +281,7 @@ class Set extends Component {
 						autoFocus
 						onClick={async () => {
 							// delete set key
-							var cmd = ["srem", this.props.path, this.state.selectValue];
+							let cmd = ["srem", this.props.path, this.state.selectValue];
 							await Api.do(cmd);
 							if (this.state.size == 1) {
 								event.emitComponent(Left, "left-refresh", this.props.data);
@@ -302,7 +303,7 @@ class Set extends Component {
 	}
 
 	addRow() {
-		var addRowValue = "";
+		let addRowValue = "";
 
 		Comfirm.open({
 			width: "400px",
@@ -319,6 +320,7 @@ class Set extends Component {
 						defaultValue={addRowValue}
 						onChange={(e) => (addRowValue = e.target.value)}
 						autoComplete="off"
+						spellCheck="false"
 					/>
 				</div>
 			),
@@ -332,13 +334,13 @@ class Set extends Component {
 			),
 		});
 
-		var cancel = () => {
+		let cancel = () => {
 			Comfirm.close();
 		};
 
-		var submit = async () => {
+		let submit = async () => {
 			// set add row
-			var cmd = ["SADD", this.props.path, addRowValue];
+			let cmd = ["SADD", this.props.path, addRowValue];
 			await Api.do(cmd);
 			this.reset();
 			await this.getSet(this.props.path);
@@ -349,14 +351,14 @@ class Set extends Component {
 	}
 
 	async saveSet() {
-		var value = this.state.selectValue;
+		let value = this.state.selectValue;
 
-		var oldValue = this.state.res[this.selectIndex].value;
+		let oldValue = this.state.res[this.selectIndex].value;
 		if (oldValue == value) {
 			return message.error("no change");
 		}
 
-		var cmd = ["srem", this.props.path, oldValue];
+		let cmd = ["srem", this.props.path, oldValue];
 		await Api.do(cmd);
 
 		cmd = ["SADD", this.props.path, value];
@@ -415,7 +417,7 @@ class Set extends Component {
 
 	renderItem = (value, height) => {
 		if (value.index > this.state.res.length - 1) return;
-		var classList = ["v-list-item"];
+		let classList = ["v-list-item"];
 		if (this.selectIndex > this.state.res.length - 1) {
 			this.selectIndex = this.state.res.length - 1;
 		}

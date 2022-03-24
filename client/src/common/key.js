@@ -6,7 +6,7 @@ import Api from "../tools/api";
 import Left from "../component/middle/left/left";
 import Right from "../component/middle/right/right";
 
-var keyInfo = {
+let keyInfo = {
 	delete: (node) => {
 		Comfirm.open({
 			width: "400px",
@@ -19,8 +19,8 @@ var keyInfo = {
 					<Button
 						onClick={async () => {
 							// delete redis key
-							var cmd = ["DEL", node.path];
-							var res = await Api.do(cmd);
+							let cmd = ["DEL", node.path];
+							let res = await Api.do(cmd);
 							if (res.msg == "1") {
 								event.emitComponent(Left, "left-refresh", node);
 								event.emitComponent(Right, "right-closeKey", node);
@@ -55,7 +55,7 @@ var keyInfo = {
 								Comfirm.close();
 								return;
 							}
-							var cmd = ["RENAME", node.path, changePath];
+							let cmd = ["RENAME", node.path, changePath];
 							let res = await Api.do(cmd);
 							if (res.msg == "OK") {
 								closeRight && event.emitComponent(Right, "right-closeKey", node);

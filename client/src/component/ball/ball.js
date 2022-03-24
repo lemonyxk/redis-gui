@@ -21,7 +21,7 @@ class Ball extends Component {
 
 	onResize(data) {
 		this.window = data;
-		this.onDragStop({ x: 12, y: this.window.height - this.ballSize - 12 - 120 });
+		this.onDragStop({ x: this.window.width - this.ballSize - 12, y: this.window.height - this.ballSize - 12 - 120 });
 	}
 
 	window = store.get("window");
@@ -44,8 +44,8 @@ class Ball extends Component {
 
 		this.isClick = false;
 
-		var cx = d.x;
-		var cy = d.y;
+		let cx = d.x;
+		let cy = d.y;
 
 		if (d.x < 12) d.x = 12;
 		if (d.x > this.window.width - this.ballSize - 12) d.x = this.window.width - this.ballSize - 12;
@@ -53,7 +53,7 @@ class Ball extends Component {
 		if (d.y < 12) d.y = 12;
 		if (d.y > this.window.height - this.ballSize - 12) d.y = this.window.height - this.ballSize - 12;
 
-		var m = "";
+		let m = "";
 		if (d.x < this.window.width / 2) {
 			if (d.y < this.window.height / 2) {
 				if (d.x < d.y) {
@@ -92,17 +92,17 @@ class Ball extends Component {
 			}
 		}
 
-		var add = 0;
+		let add = 0;
 
 		if (m == "x") {
-			var mx = cx - d.x;
+			let mx = cx - d.x;
 			if (mx > 0) {
 				add = -this.initSpeed;
 			} else {
 				add = this.initSpeed;
 			}
 
-			var fn = () => {
+			let fn = () => {
 				requestAnimationFrame(() => {
 					cx += add;
 					if (add > 0) {
@@ -119,14 +119,14 @@ class Ball extends Component {
 
 			fn();
 		} else {
-			var my = cy - d.y;
+			let my = cy - d.y;
 			if (my > 0) {
 				add = -this.initSpeed;
 			} else {
 				add = this.initSpeed;
 			}
 
-			var fn = () => {
+			let fn = () => {
 				requestAnimationFrame(() => {
 					cy += add;
 					if (add > 0) {

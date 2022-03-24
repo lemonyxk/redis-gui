@@ -61,9 +61,9 @@ class Left extends Component {
 	};
 
 	findNode(id) {
-		var res = null;
-		var data = this.state.data;
-		var find = (id, data) => {
+		let res = null;
+		let data = this.state.data;
+		let find = (id, data) => {
 			for (let i = 0; i < data.children.length; i++) {
 				if (data.children[i].isDir) {
 					if (find(id, data.children[i])) {
@@ -84,9 +84,9 @@ class Left extends Component {
 	}
 
 	findSelectedNode() {
-		var res = null;
-		var data = this.state.data;
-		var find = (data) => {
+		let res = null;
+		let data = this.state.data;
+		let find = (data) => {
 			for (let i = 0; i < data.children.length; i++) {
 				if (data.children[i].isDir) {
 					if (find(data.children[i])) {
@@ -118,7 +118,7 @@ class Left extends Component {
 
 		for (let i = 0; i < data.length; i++) {
 			let el = data[i];
-			var id = el.Path + el.IsDir + el.IsKey;
+			let id = el.Path + el.IsDir + el.IsKey;
 			parent.children.push({
 				parent: parent,
 				name: el.Name,
@@ -148,7 +148,7 @@ class Left extends Component {
 	}
 
 	getDB = async () => {
-		var dbList = await Api.DBList();
+		let dbList = await Api.DBList();
 		this.setState({ dbList: dbList });
 	};
 
@@ -165,7 +165,7 @@ class Left extends Component {
 			}
 		});
 		event.addComponentListener(Left, "left-selected", async (data) => {
-			var node = this.findSelectedNode();
+			let node = this.findSelectedNode();
 			if (node) {
 				node.selected = false;
 			}
@@ -174,7 +174,7 @@ class Left extends Component {
 				this.selectedNodeID = null;
 			} else {
 				this.selectedNodeID = data.id;
-				var node = this.findNode(data.id);
+				let node = this.findNode(data.id);
 				if (node) {
 					node.selected = true;
 				}
@@ -192,12 +192,12 @@ class Left extends Component {
 	}
 
 	async loading(db, counter, finish) {
-		var parent = this.state.data;
-		var path = "";
-		var page = 1;
-		var limit = this.limit;
+		let parent = this.state.data;
+		let path = "";
+		let page = 1;
+		let limit = this.limit;
 
-		var data = await Api.list(path, page, limit);
+		let data = await Api.list(path, page, limit);
 
 		if (finish) {
 			if (this.hasLoadMore(parent.children)) {
@@ -205,7 +205,7 @@ class Left extends Component {
 			}
 		}
 
-		var find = (id) => {
+		let find = (id) => {
 			for (let i = 0; i < parent.children.length; i++) {
 				if (parent.children[i].id == id) {
 					return parent.children[i];
@@ -261,6 +261,8 @@ class Left extends Component {
 	}
 
 	start(db) {
+		this.exitSearch();
+
 		event.emitComponent(Right, "right-closeAllKey");
 
 		this.setState(
@@ -271,33 +273,16 @@ class Left extends Component {
 			},
 			async () => {
 				this.selectedNodeID = null;
-				var { parent, data, page, limit } = await this.getNodes(this.state.data, "", 1);
+				let { parent, data, page, limit } = await this.getNodes(this.state.data, "", 1);
 				await this.renderNode(parent, data, page, limit);
 			}
 		);
 	}
 
 	loadTree() {
-		var res = Tree(this);
+		let res = Tree(this);
 		for (const key in res) {
 			this[key] = res[key];
-		}
-	}
-
-	async onSelect(node) {
-		if (!node.isDir) {
-			if (node.path) {
-				if (this.selectedNodeID) {
-					var n = this.findNode(this.selectedNodeID);
-					if (n) {
-						n.selected = false;
-					}
-				}
-				this.selectedNodeID = node.id;
-				node.selected = true;
-				this.setState({ data: this.state.data });
-			}
-			return;
 		}
 	}
 
@@ -305,7 +290,7 @@ class Left extends Component {
 		if (!node.isDir) {
 			if (node.path) {
 				if (this.selectedNodeID) {
-					var n = this.findNode(this.selectedNodeID);
+					let n = this.findNode(this.selectedNodeID);
 					if (n) {
 						n.selected = false;
 					}
@@ -319,7 +304,7 @@ class Left extends Component {
 				if (this.inSearch) {
 					this.renderSearch(this.iter);
 				} else {
-					var { parent, data, page, limit } = await this.getNodes(node.parent, node.parent.path, node.page);
+					let { parent, data, page, limit } = await this.getNodes(node.parent, node.parent.path, node.page);
 					await this.renderNode(parent, data, page, limit);
 				}
 			}
@@ -338,7 +323,7 @@ class Left extends Component {
 			if (this.inSearch) {
 				this.renderSearch(this.iter);
 			} else {
-				var { parent, data, page, limit } = await this.getNodes(node, node.path);
+				let { parent, data, page, limit } = await this.getNodes(node, node.path);
 				await this.renderNode(parent, data, page, limit);
 			}
 		} else {
@@ -412,6 +397,7 @@ class Left extends Component {
 									defaultValue={this.searchValue}
 									onChange={(e) => (this.searchValue = e.target.value)}
 									ref={this.searchInput}
+									spellCheck="false"
 									onKeyDown={(e) => {
 										if (e.keyCode === 13) {
 											this.startSearch();
@@ -443,7 +429,7 @@ class Left extends Component {
 	}
 
 	async refresh(id) {
-		var node = null;
+		let node = null;
 
 		// id is null
 		if (!id) {
@@ -462,23 +448,23 @@ class Left extends Component {
 			return;
 		}
 
-		var { parent, data, page, limit } = await this.getNodes(node.parent, node.parent.path, 1);
+		let { parent, data, page, limit } = await this.getNodes(node.parent, node.parent.path, 1);
 
 		// merge node parent and data
 		if (!data) {
 			data = [];
 		}
 
-		var map = {};
-		for (var i = 0; i < node.parent.children.length; i++) {
+		let map = {};
+		for (let i = 0; i < node.parent.children.length; i++) {
 			map[node.parent.children[i].id] = { i: i, v: false };
 		}
 
 		// add
-		for (var i = 0; i < data.length; i++) {
-			var el = data[i];
-			var id = el.Path + el.IsDir + el.IsKey;
-			var index = map[id];
+		for (let i = 0; i < data.length; i++) {
+			let el = data[i];
+			let id = el.Path + el.IsDir + el.IsKey;
+			let index = map[id];
 			if (!index) {
 				node.parent.children.push({
 					parent: node.parent,
@@ -531,7 +517,7 @@ class Left extends Component {
 
 	async renderSearch(iter) {
 		this.iter = iter;
-		var res = await Api.scan(this.searchValue, this.iter, this.limit);
+		let res = await Api.scan(this.searchValue, this.iter, this.limit);
 		this.iter = res.msg.iter;
 		this.renderNode(this.state.data, res.msg.data || [], 1, this.limit);
 	}
@@ -551,7 +537,9 @@ class Left extends Component {
 
 	exitSearch() {
 		this.searchValue = "";
-		this.searchInput.current.querySelector("input").value = "";
+		if (this.searchInput && this.searchInput.current) {
+			this.searchInput.current.querySelector("input").value = "";
+		}
 		this.state.data.children = this.temp;
 		this.temp = [];
 		this.iter = 0;

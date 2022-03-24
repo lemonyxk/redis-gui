@@ -13,7 +13,7 @@ import event from "./tools/event";
 
 // console.warn = () => {};
 
-var uuid = store.get("uuid");
+let uuid = store.get("uuid");
 
 if (!uuid) {
 	uuid = Math.random().toString(36).slice(2);
@@ -27,8 +27,8 @@ axios.defaults.baseURL = "";
 axios.defaults.timeout = 15000;
 
 axios.interceptors.request.use((request) => {
-	var db = store.get("db") === undefined ? 0 : parseInt(store.get("db"));
-	var token = store.get("token") === undefined ? "" : store.get("token");
+	let db = store.get("db") === undefined ? 0 : parseInt(store.get("db"));
+	let token = store.get("token") === undefined ? "" : store.get("token");
 
 	if (request.method === "get") {
 		let req = JSON.parse(JSON.stringify(request));

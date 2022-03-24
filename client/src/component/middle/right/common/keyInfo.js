@@ -40,6 +40,7 @@ class KeyInfo extends Component {
 							value={this.state.changePath}
 							onChange={(e) => this.setState({ changePath: e.target.value })}
 							autoComplete="off"
+							spellCheck="false"
 						/>
 					</div>
 					<div className="right">
@@ -70,7 +71,7 @@ class KeyInfo extends Component {
 	}
 
 	ttl() {
-		var ttl = this.state.ttl;
+		let ttl = this.state.ttl;
 
 		Comfirm.open({
 			width: "400px",
@@ -86,6 +87,7 @@ class KeyInfo extends Component {
 							defaultValue={ttl}
 							onChange={(e) => (ttl = e.target.value)}
 							autoComplete="off"
+							spellCheck="false"
 						/>
 					</div>
 				</div>
@@ -95,7 +97,7 @@ class KeyInfo extends Component {
 					<Button onClick={() => Comfirm.close()}>Cancel</Button>
 					<Button
 						onClick={async () => {
-							var cmd = ["EXPIRE", this.state.path, ttl];
+							let cmd = ["EXPIRE", this.state.path, ttl];
 							if (ttl == -1) {
 								cmd = ["PERSIST", this.state.path];
 							}

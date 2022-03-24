@@ -177,7 +177,7 @@ class Connection extends Component {
 	}
 
 	createConnection() {
-		var data = this.modal.current.submit();
+		let data = this.modal.current.submit();
 
 		if (!data.name) return message.error("Please input connection name");
 

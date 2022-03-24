@@ -1,6 +1,6 @@
 module server
 
-go 1.17
+go 1.18
 
 require (
 	github.com/go-redis/redis/v8 v8.11.4
@@ -9,7 +9,7 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/kr/pty v1.1.1
 	github.com/lemoyxk/console v0.0.0-20220210101750-ec7eacfbe325
-	github.com/lemoyxk/kitty/v2 v2.0.0-20220313090808-ce0124dc81b0
+	github.com/lemoyxk/kitty/v2 v2.0.0-20220320180520-6c5a3e6338e2
 	github.com/lemoyxk/utils v1.0.0
 	github.com/liyue201/gostl v1.0.1
 	github.com/stretchr/testify v1.7.0
@@ -28,6 +28,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/iamacarpet/go-winpty v1.0.2 // indirect
 	github.com/jedib0t/go-pretty v4.3.0+incompatible // indirect
+	github.com/lemonyxk/structure/v3 v3.0.1-0.20220321181107-4b0496fa833b // indirect
 	github.com/lemoyxk/caller v0.0.0-20211111155840-a4a8dd35a4dd // indirect
 	github.com/lemoyxk/structure v0.0.0-20211220180515-361786807cb4 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect

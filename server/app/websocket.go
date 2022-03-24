@@ -23,8 +23,9 @@ type WebSocket struct {
 }
 
 type Json struct {
+	ID    int64       `json:"id"`
 	Event string      `json:"event"`
-	Data  interface{} `json:"data"`
+	Data  any `json:"data"`
 }
 
 func (w *WebSocket) Json(fd int64, pack Json) error {

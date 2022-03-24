@@ -80,3 +80,12 @@ input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
 	transition-delay: 99999s;
 } */
+
+.MuiMenu-paper {
+	transform: none !important;
+}
+
+input,
+textarea {
+	user-select: text;
+}

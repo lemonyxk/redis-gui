@@ -52,7 +52,7 @@ func (d *Data) Get(path string, page int, limit int) []Info {
 	var index = 0
 
 	if path == "" {
-		d.root.Children.Traversal(func(key, value interface{}) bool {
+		d.root.Children.Traversal(func(key, value any) bool {
 			if index >= offset && index <= offset+limit-1 {
 				var v = value.(*Tire)
 
@@ -94,7 +94,7 @@ func (d *Data) Get(path string, page int, limit int) []Info {
 
 		if i == len(res)-1 {
 			if node.IsDir {
-				node.Children.Traversal(func(key, value interface{}) bool {
+				node.Children.Traversal(func(key, value any) bool {
 					if index >= offset && index <= offset+limit-1 {
 						var v = value.(*Tire)
 						if v.IsDir {
@@ -206,7 +206,7 @@ func (d *Data) Scan(count int) []Info {
 }
 
 func (d *Data) scan(node *Tire, res *[]Info, count int) {
-	node.Children.Traversal(func(key, value interface{}) bool {
+	node.Children.Traversal(func(key, value any) bool {
 		var n = value.(*Tire)
 
 		if n.IsDir {

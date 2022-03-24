@@ -19,7 +19,7 @@ function buildMacServer() {
     echo "build server ..."
     # mac
     cd "$server" || exit
-    go build -o bin/server main.go
+    env GOOS=darwin GOARCH=amd64 CGO_ENABLED=1 go build -o bin/server main.go
     cd "$current" || exit
     cp server/bin/server electron/src/mac-server
 }
@@ -39,20 +39,46 @@ function buildWindowsServer() {
 
 function buildWindowsElectron() {
     cd "$electron" || exit
-    yarn make --platform win32
+    yarn package --platform win32
 }
 
 if [ "$1" == mac ]; then
     echo "build on mac"
-    buildClient
-    buildMacServer
-    buildMacElectron
+
+    if [ "$2" == all ]; then
+        buildClient
+        buildMacServer
+        buildMacElectron
+    elif [ "$2" == client ]; then
+        buildClient
+    elif [ "$2" == server ]; then
+        buildMacServer
+    elif [ "$2" == electron ]; then
+        buildMacElectron
+    else
+        echo "no build target"
+        exit
+    fi
+
     echo "build on mac success"
 elif [ "$1" == windows ]; then
     echo "build on windows"
-    buildClient
-    buildWindowsServer
-    buildWindowsElectron
+
+    if [ "$2" == all ]; then
+        buildClient
+        buildWindowsServer
+        buildWindowsElectron
+    elif [ "$2" == client ]; then
+        buildClient
+    elif [ "$2" == server ]; then
+        buildWindowsServer
+    elif [ "$2" == electron ]; then
+        buildWindowsElectron
+    else
+        echo "no build target"
+        exit
+    fi
+
     echo "build on windows success"
 else
     echo "not support"

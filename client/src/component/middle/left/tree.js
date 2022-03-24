@@ -3,12 +3,12 @@ import "./left.scss";
 
 import { Description, PlayArrow } from "@material-ui/icons";
 
-var toggledView = <PlayArrow style={{ height: 20, transform: "rotate(90deg)", position: "relative", top: "-1px" }} />;
-var unToggleView = <PlayArrow style={{ height: 20 }} />;
-var loadingView = <div>loading...</div>;
-var descriptionView = <Description style={{ width: 14 }} />;
+let toggledView = <PlayArrow style={{ height: 20, transform: "rotate(90deg)", position: "relative", top: "-1px" }} />;
+let unToggleView = <PlayArrow style={{ height: 20 }} />;
+let loadingView = <div>loading...</div>;
+let descriptionView = <Description style={{ width: 14 }} />;
 
-var headerStyle = {
+let headerStyle = {
 	userSelect: "none",
 	cursor: "pointer",
 	display: "flex",
@@ -19,7 +19,7 @@ var headerStyle = {
 	fontSize: "14px",
 };
 
-var containerStyle = {
+let containerStyle = {
 	display: "flex",
 	justifyContent: "flex-start",
 	alignItems: "center",
@@ -27,7 +27,7 @@ var containerStyle = {
 	width: "100%",
 };
 
-var itemDesc = {
+let itemDesc = {
 	display: "flex",
 	justifyContent: "flex-start",
 	alignItems: "center",
@@ -38,7 +38,7 @@ var itemDesc = {
 	fontSize: "14px",
 };
 
-var fn = (self) => {
+let fn = (self) => {
 	return {
 		style: {
 			tree: {
@@ -92,7 +92,7 @@ var fn = (self) => {
 					);
 				}
 
-				var classList = ["tree-list-item", "tree-color"];
+				let classList = ["tree-list-item", "tree-color"];
 				if (props.node.selected) {
 					classList.push("tree-list-item-background");
 				}
@@ -103,7 +103,7 @@ var fn = (self) => {
 						onContextMenuCapture={(e) => {
 							e.preventDefault();
 							if (self.selectedNodeID) {
-								var n = self.findNode(self.selectedNodeID);
+								let n = self.findNode(self.selectedNodeID);
 								if (n) {
 									n.selected = false;
 								}
@@ -113,13 +113,7 @@ var fn = (self) => {
 							self.menuEvent = e;
 							self.openMenu(e);
 						}}
-						{...(() => {
-							if (props.node.path) {
-								return { onClick: () => self.onSelect(props.node), onDoubleClick: () => self.onKey(props.node) };
-							} else {
-								return { onClick: () => self.onKey(props.node) };
-							}
-						})()}
+						onClick={() => self.onKey(props.node)}
 						style={containerStyle}
 					>
 						{self.decorators.Header(props.node)}

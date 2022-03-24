@@ -76,25 +76,25 @@ class Hash extends Component {
 		if (this.cache[this.page]) {
 			this.state.res = [];
 
-			var data = [...this.cache[this.page]];
+			let data = [...this.cache[this.page]];
 
 			for (let i = 0; i < data.length; i += 2) {
-				var key = data[i];
-				var value = data[i + 1];
+				let key = data[i];
+				let value = data[i + 1];
 				this.state.res.push({ key, value });
 			}
 		} else {
 			if (this.iter == 0 && this.page != 1) {
 				this.state.res = [];
 
-				var data = [...this.overage];
+				let data = [...this.overage];
 				this.overage = [];
 
-				var cache = [];
+				let cache = [];
 
 				for (let i = 0; i < data.length; i += 2) {
-					var key = data[i];
-					var value = data[i + 1];
+					let key = data[i];
+					let value = data[i + 1];
 					if (this.state.res.length >= this.limit) {
 						this.overage.push(key);
 						this.overage.push(value);
@@ -109,18 +109,17 @@ class Hash extends Component {
 			} else {
 				this.state.res = [];
 
-				var data = [...this.overage];
+				let data = [...this.overage];
 
 				this.overage = [];
-
-				var res = await Api.do(["HSCAN", key, this.iter, "COUNT", this.limit]);
+				let res = await Api.do(["HSCAN", key, this.iter, "COUNT", this.limit]);
 				this.iter = res.msg[0];
 				data.push(...res.msg[1]);
 
-				var cache = [];
+				let cache = [];
 				for (let i = 0; i < data.length; i += 2) {
-					var key = data[i];
-					var value = data[i + 1];
+					let key = data[i];
+					let value = data[i + 1];
 					if (this.state.res.length >= this.limit) {
 						this.overage.push(key);
 						this.overage.push(value);
@@ -257,6 +256,7 @@ class Hash extends Component {
 												onChange={(e) => this.setState({ page: e.target.value })}
 												onBlur={(e) => this.changePage(e.target.value)}
 												autoComplete="off"
+												spellCheck="false"
 											/>
 											<Button className="forward" size="small" onClick={() => this.forward()}>
 												<ArrowForwardIosIcon style={{ width: 18 }}></ArrowForwardIosIcon>
@@ -298,7 +298,7 @@ class Hash extends Component {
 						autoFocus
 						onClick={async () => {
 							// delete hash key
-							var cmd = ["HDEL", this.props.path, this.state.selectKey];
+							let cmd = ["HDEL", this.props.path, this.state.selectKey];
 							await Api.do(cmd);
 							if (this.state.size == 1) {
 								event.emitComponent(Left, "left-refresh", this.props.data);
@@ -320,8 +320,8 @@ class Hash extends Component {
 	}
 
 	addRow() {
-		var addRowKey = "";
-		var addRowValue = "";
+		let addRowKey = "";
+		let addRowValue = "";
 
 		Comfirm.open({
 			width: "400px",
@@ -338,6 +338,7 @@ class Hash extends Component {
 						defaultValue={addRowKey}
 						onChange={(e) => (addRowKey = e.target.value)}
 						autoComplete="off"
+						spellCheck="false"
 					/>
 					<Input
 						className="add-row-value"
@@ -348,6 +349,7 @@ class Hash extends Component {
 						defaultValue={addRowValue}
 						onChange={(e) => (addRowValue = e.target.value)}
 						autoComplete="off"
+						spellCheck="false"
 					/>
 				</div>
 			),
@@ -361,14 +363,14 @@ class Hash extends Component {
 			),
 		});
 
-		var cancel = () => {
+		let cancel = () => {
 			Comfirm.close();
 		};
 
-		var submit = async () => {
+		let submit = async () => {
 			// hash add row
-			var cmd = ["HSET", this.props.path, addRowKey, addRowValue];
-			var res = await Api.do(cmd);
+			let cmd = ["HSET", this.props.path, addRowKey, addRowValue];
+			let res = await Api.do(cmd);
 			if (res.code != 200) {
 				message.error(res.msg);
 			} else {
@@ -382,21 +384,21 @@ class Hash extends Component {
 	}
 
 	async saveHash() {
-		var key = this.state.selectKey;
-		var value = this.state.selectValue;
+		let key = this.state.selectKey;
+		let value = this.state.selectValue;
 
-		var oldKey = this.state.res[this.selectIndex].key;
-		var oldValue = this.state.res[this.selectIndex].value;
+		let oldKey = this.state.res[this.selectIndex].key;
+		let oldValue = this.state.res[this.selectIndex].value;
 		if (oldValue == value && oldKey == key) {
 			return message.error("no change");
 		}
 
 		if (oldKey != key) {
-			var cmd = ["HDEL", this.props.path, oldKey];
+			let cmd = ["HDEL", this.props.path, oldKey];
 			await Api.do(cmd);
 		}
 
-		var cmd = ["HSET", this.props.path, key, value];
+		let cmd = ["HSET", this.props.path, key, value];
 		await Api.do(cmd);
 
 		this.reset();
@@ -456,7 +458,7 @@ class Hash extends Component {
 
 	renderItem = (value, height) => {
 		if (value.index > this.state.res.length - 1) return;
-		var classList = ["v-list-item"];
+		let classList = ["v-list-item"];
 		if (this.selectIndex > this.state.res.length - 1) {
 			this.selectIndex = this.state.res.length - 1;
 		}

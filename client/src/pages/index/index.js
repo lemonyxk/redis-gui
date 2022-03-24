@@ -37,10 +37,10 @@ class Index extends Component {
 		event.addComponentListener(Index, "connect", (data) => {
 			this.load = message.loading("connecting...");
 
-			utils.after(800).then(() => {
-				var db = parseInt(data.db);
+			utils.after(800).then(async () => {
+				let db = parseInt(data.db);
 				store.set("db", db);
-				ws.socket.Emit("/login", {
+				let res = await ws.socket.Do("/login", {
 					name: data.name,
 					split: data.split,
 					db: db,
@@ -49,24 +49,25 @@ class Index extends Component {
 					password: data.password,
 					addr: data.addr.map((item) => item.host + ":" + item.port),
 				});
+				this.login(res.data);
 			});
 		});
 
 		let connections = store.get("connections") || [];
 		if (connections.length == 0) return;
-		var checked = connections.filter((item) => item.checked);
+		let checked = connections.filter((item) => item.checked);
 		if (checked.length == 0) return;
 		event.emitComponent(Index, "connect", checked[0]);
 	}
 
-	login(e, data) {
+	login(data) {
+		this.load.done(data.status);
+
 		if (data.code !== 200) {
 			message.close();
 			return message.error(data.msg);
 		}
 
-		ws.socket.Global.token = data.msg.Token;
-		this.load.done(data.status);
 		store.set("token", data.msg.Token);
 		store.set("connected", data.msg.name);
 		event.emitComponent(Connection, "connected", data);
@@ -85,7 +86,7 @@ class Index extends Component {
 			return message.error(data.msg);
 		}
 
-		var res = [];
+		let res = [];
 		for (const key in data.msg) {
 			res.push(key);
 			res.push(data.msg[key]);
@@ -97,16 +98,21 @@ class Index extends Component {
 	componentDidMount() {
 		this.load = message.loading("connecting...");
 		store.remove("connected");
-		ws.socket = new Socket({ addr: Api.ws });
-		ws.socket.Global.uuid = this.uuid;
-		ws.socket.AddListener("/login", this.login.bind(this));
+		ws.socket = new Socket({ addr: Api.ws, heartBeatInterval: 3 });
+
+		ws.socket.before = () => {
+			let db = store.get("db") === undefined ? 0 : parseInt(store.get("db"));
+			let token = store.get("token") === undefined ? "" : store.get("token");
+			let uuid = store.get("uuid") === undefined ? "" : store.get("uuid");
+			ws.socket.Global = { db: db, token, uuid };
+		};
+
 		ws.socket.AddListener("/loading", this.loading.bind(this));
 		ws.socket.AddListener("/serverLog", this.serverLog.bind(this));
 		ws.socket.Start(() => this.start());
 	}
 
 	componentWillUnmount() {
-		ws.socket.RemoveListener("/login");
 		ws.socket.RemoveListener("/loading");
 		ws.socket.Close();
 	}

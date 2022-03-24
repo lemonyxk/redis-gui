@@ -16,28 +16,30 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-// type rl interface {
-// 	Printf(xtc context.Context,format string, v ...interface{})
-// }
-//
-// type log struct {}
-//
-// func (l *log) Printf(xtc context.Context,format string, v ...interface{}) {
-//
-// }
-//
-// func init() {
-// 	var a = &log{}
-// 	redis.SetLogger(a)
-// }
+// clear redis log
+type rl interface {
+	Printf(xtc context.Context, format string, v ...any)
+}
 
-func NewFailover(masterName, password string, sentinelAddrs []string) (*Model, error) {
+type log struct{}
+
+func (l *log) Printf(xtc context.Context, format string, v ...any) {
+
+}
+
+func init() {
+	var a = &log{}
+	redis.SetLogger(a)
+}
+
+func NewFailover(masterName, password string, db int, sentinelAddrs []string) (*Model, error) {
 
 	var client = Failover(&redis.FailoverOptions{
 		MasterName:    masterName,
 		Username:      "",
 		Password:      password,
 		SentinelAddrs: sentinelAddrs,
+		DB:            db,
 	})
 
 	err := client.Ping(context.Background()).Err()
@@ -48,11 +50,12 @@ func NewFailover(masterName, password string, sentinelAddrs []string) (*Model, e
 	return NewModel(client), nil
 }
 
-func NewClient(password string, addr string) (*Model, error) {
+func NewClient(password string, db int, addr string) (*Model, error) {
 	var client = Client(&redis.Options{
 		Username: "",
 		Password: password,
 		Addr:     addr,
+		DB:       db,
 	})
 
 	err := client.Ping(context.Background()).Err()

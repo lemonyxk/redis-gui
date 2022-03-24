@@ -22,12 +22,14 @@ func InfoAll(conn *server.Conn, stream *socket.Stream) error {
 
 	client.SetEmitInfoAll(true)
 
+	var data = app.DataMap.GetProcess(client.GetProcessID())
+
 	return app.Server.Json(conn.FD, app.Json{
 		Event: stream.Event,
 		Data: http.JsonFormat{
 			Status: "SUCCESS",
 			Code:   200,
-			Msg:    client.InfoAll,
+			Msg:    data.GetInfoAll(),
 		},
 	})
 }

@@ -64,7 +64,7 @@ class QueryLine extends Component {
 	chart = null;
 
 	componentDidMount() {
-		var chartDom = document.getElementById("query");
+		let chartDom = document.getElementById("query");
 		this.chart = echarts.init(chartDom);
 		this.chart.setOption(this.option);
 	}
@@ -94,11 +94,11 @@ class Query {
 	}
 
 	infoAll(e, data) {
-		var res = [];
+		let res = [];
 
 		for (let i = 0; i < data.msg.length; i++) {
 			const element = data.msg[i];
-			var r = JSON.parse(element);
+			let r = JSON.parse(element);
 			res.push({
 				time: r.Time,
 				instantaneous_ops_per_sec: r.Stats.instantaneous_ops_per_sec,

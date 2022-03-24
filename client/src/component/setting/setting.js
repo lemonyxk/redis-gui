@@ -25,6 +25,7 @@ class Setting extends Component {
 								value={this.state.show}
 								onChange={(e) => this.setState({ show: e.target.value })}
 								autoComplete="off"
+								spellCheck="false"
 							/>
 						</FormControl>
 
@@ -39,6 +40,7 @@ class Setting extends Component {
 								value={this.state.limit}
 								onChange={(e) => this.setState({ limit: e.target.value })}
 								autoComplete="off"
+								spellCheck="false"
 							/>
 						</FormControl>
 					</div>

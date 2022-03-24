@@ -27,9 +27,9 @@ func Login(login message.Login) (*redis.Model, error) {
 		if len(login.Addr) == 0 {
 			return nil, errors.New("addr is empty")
 		}
-		return redis.NewClient(login.Password, login.Addr[0])
+		return redis.NewClient(login.Password, login.DB, login.Addr[0])
 	case "sentinel":
-		return redis.NewFailover(login.MasterName, login.Password, login.Addr)
+		return redis.NewFailover(login.MasterName, login.Password, login.DB, login.Addr)
 	default:
 		return nil, errors.New("type is empty")
 	}
@@ -64,7 +64,24 @@ func CreateInfo(login message.Login) (*Info, error) {
 
 	info.Login = login
 
-	info.Watch()
-
 	return info, nil
+}
+
+func UpdateInfo(info *Info, db int) error {
+
+	var login = info.Login
+	login.DB = db
+
+	var r, err = Login(login)
+	if err != nil {
+		return err
+	}
+
+	info.Close()
+
+	info.SetModel(r)
+
+	info.DB = db
+
+	return nil
 }

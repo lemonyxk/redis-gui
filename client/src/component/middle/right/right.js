@@ -21,7 +21,7 @@ class Right extends Component {
 
 	onClose(key, shouldSelect) {
 		this.state.data = this.state.data.filter((item) => item.name !== key);
-		var node = null;
+		let node = null;
 		if (this.state.data.length > 0) {
 			if (this.state.activeKey === key) {
 				this.state.activeKey = this.state.data[0].name;
@@ -33,7 +33,7 @@ class Right extends Component {
 			this.state.activeKey = "";
 		}
 
-		var data = null;
+		let data = null;
 
 		if (node && shouldSelect) {
 			data = { ...node.content.props.data };
@@ -45,20 +45,20 @@ class Right extends Component {
 	}
 
 	onChange(activeKey) {
-		var node = this.state.data.find((item) => item.name === activeKey);
+		let node = this.state.data.find((item) => item.name === activeKey);
 		event.emitComponent(Left, "left-selected", { ...node.content.props.data });
 		this.setState({ activeKey: activeKey });
 	}
 
 	async getType(data) {
-		var key = data.path;
-		var index = this.state.data.findIndex((item) => item.name === key);
+		let key = data.path;
+		let index = this.state.data.findIndex((item) => item.name === key);
 		if (index !== -1) {
 			this.setState({ activeKey: key });
 			return;
 		}
 
-		var type = await Api.type(key);
+		let type = await Api.type(key);
 
 		this.state.data.push({ name: key, content: this.renderType(type, key, data) });
 
@@ -93,13 +93,13 @@ class Right extends Component {
 	}
 
 	async reloadKey(node) {
-		var key = node.path;
-		var index = this.state.data.findIndex((item) => item.name === key);
+		let key = node.path;
+		let index = this.state.data.findIndex((item) => item.name === key);
 		if (index === -1) {
 			return;
 		}
 
-		var type = await Api.type(key);
+		let type = await Api.type(key);
 
 		this.state.data[index] = { name: key, content: null };
 		this.setState({ activeKey: key, data: this.state.data });

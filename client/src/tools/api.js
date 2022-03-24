@@ -1,15 +1,14 @@
-import axios from "axios";
 import dayjs from "dayjs";
+import ws from "./socket";
 
 const Api = {
 	queryLogs: [],
 	serverLogs: [],
-	http: "http://127.0.0.1:8666",
-	ws: "ws://127.0.0.1:8667",
+	ws: "ws://127.0.0.1:8667/ws",
 
 	queryLog(params, data) {
-		var cmdStr = params.join(" ");
-		var str = `${dayjs().format("YYYY-MM-DD HH:mm:ss")} CMD: ${cmdStr} `;
+		let cmdStr = params.join(" ");
+		let str = `${dayjs().format("YYYY-MM-DD HH:mm:ss")} CMD: ${cmdStr} `;
 		if (data.data.code != 200) {
 			str += `MSG: ${data.data.msg}`;
 		}
@@ -20,8 +19,8 @@ const Api = {
 	},
 
 	serverLog(data) {
-		var dataStr = data.join(" ");
-		var str = `${dayjs().format("YYYY-MM-DD HH:mm:ss")} EVENT: ${dataStr} `;
+		let dataStr = data.join(" ");
+		let str = `${dayjs().format("YYYY-MM-DD HH:mm:ss")} EVENT: ${dataStr} `;
 		this.serverLogs.push(str);
 		if (this.serverLogs.length > 300) {
 			this.serverLogs.shift();
@@ -29,15 +28,15 @@ const Api = {
 	},
 
 	async list(path, page, limit) {
-		let res = await axios.get(`${this.http}/list`, { path: path, page: page, limit: limit });
+		let res = await ws.socket.Do("/list", { path: path, page: page, limit: limit });
 		if (!res.data.msg) res.data.msg = [];
-		var data = res.data.msg;
+		let data = res.data.msg;
 		return data;
 	},
 
 	async DBList() {
-		var dbList = {};
-		let res = await axios.get(`${this.http}/db`);
+		let dbList = {};
+		let res = await ws.socket.Do("/db", {});
 		let db = res.data.msg.db[1];
 		for (let i = 0; i < db; i++) {
 			dbList[i] = 0;
@@ -54,22 +53,22 @@ const Api = {
 	},
 
 	async type(path) {
-		let res = await axios.get(`${this.http}/type`, { path: path });
-		var type = res.data.msg;
+		let res = await ws.socket.Do("/type", { path: path });
+		let type = res.data.msg;
 		this.queryLog(["TYPE", path], res);
 		return type;
 	},
 
 	async do(cmd) {
-		let res = await axios.post(`${this.http}/do`, { cmd: JSON.stringify(cmd) });
-		var data = res.data;
+		let res = await ws.socket.Do("/do", { cmd: JSON.stringify(cmd) });
+		let data = res.data;
 		this.queryLog(cmd, res);
 		return data;
 	},
 
 	async scan(search, iter, limit) {
-		let res = await axios.get(`${this.http}/scan`, { limit: limit, search: search, iter: iter });
-		var data = res.data;
+		let res = await ws.socket.Do("/scan", { limit: limit, search: search, iter: iter });
+		let data = res.data;
 		this.queryLog(["SCAN", iter, search, limit], res);
 		return data;
 	},

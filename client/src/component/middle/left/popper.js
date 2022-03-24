@@ -4,12 +4,12 @@ import { Input, Paper, InputLabel, FormControl } from "@mui/material";
 import keyInfo from "../../../common/key";
 import Popper from "../../../common/popper";
 
-var fn = (self) => {
+let fn = (self) => {
 	return (
 		<Popper
 			open={!!self.state.onOpenPopper}
 			onClose={() => {
-				var v = self.findNode(self.selectedNodeID);
+				let v = self.findNode(self.selectedNodeID);
 				if (v.path != self.popperValue) {
 					keyInfo.rename(v, self.popperValue, false, false);
 				}
@@ -29,8 +29,8 @@ var fn = (self) => {
 							variant={"standard"}
 							inputself={{ id: "uncontrolled-native" }}
 							defaultValue={(() => {
-								var v = self.findNode(self.selectedNodeID);
-								var r = v ? v.path : "";
+								let v = self.findNode(self.selectedNodeID);
+								let r = v ? v.path : "";
 								self.popperValue = r;
 								return r;
 							})()}
@@ -41,7 +41,7 @@ var fn = (self) => {
 							onClick={(e) => e.stopPropagation()}
 							onKeyDown={(e) => {
 								if (e.keyCode == 13) {
-									var v = self.findNode(self.selectedNodeID);
+									let v = self.findNode(self.selectedNodeID);
 									keyInfo.rename(v, self.popperValue, false, false);
 									return self.closePopper();
 								}

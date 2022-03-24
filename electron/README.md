@@ -1,4 +1,4 @@
-# redis-desktop
+# redis-gui
 
 1.install
 

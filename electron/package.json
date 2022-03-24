@@ -1,5 +1,5 @@
 {
-	"name": "redis-desktop",
+	"name": "redis-gui",
 	"version": "1.0.0",
 	"description": "My Electron application description",
 	"main": "src/index.js",
@@ -25,7 +25,7 @@
 				{
 					"name": "@electron-forge/maker-squirrel",
 					"config": {
-						"name": "redis_desktop"
+						"name": "redis-gui"
 					}
 				},
 				{
@@ -46,10 +46,7 @@
 		}
 	},
 	"dependencies": {
-		"axios": "^0.26.1",
-		"electron-prebuilt-compile": "^8.2.0",
-		"electron-squirrel-startup": "^1.0.0",
-		"unzip-stream": "^0.3.1"
+		"electron-store": "^8.0.1"
 	},
 	"devDependencies": {
 		"@electron-forge/cli": "6.0.0-beta.63",

@@ -6,7 +6,7 @@ import { MenuItem as RMenuItem, Menu as RMenu } from "@material-ui/core";
 import Divider from "@mui/material/Divider";
 import message from "../../../tools/message";
 
-var fn = (self) => {
+let fn = (self) => {
 	return (
 		<RMenu
 			anchorEl={self.state.onOpenMenu}
@@ -26,7 +26,7 @@ var fn = (self) => {
 			<RMenuItem
 				className="left-menu-list"
 				onClick={() => {
-					var node = self.findNode(self.selectedNodeID);
+					let node = self.findNode(self.selectedNodeID);
 					if (node) {
 						self.onNode(node);
 					}
@@ -43,7 +43,7 @@ var fn = (self) => {
 				className="left-menu-list"
 				onClick={(e) => {
 					e.stopPropagation();
-					var node = self.findNode(self.selectedNodeID);
+					let node = self.findNode(self.selectedNodeID);
 					let text = node.path;
 					navigator.clipboard.writeText(text);
 					self.closeMenu();
@@ -99,7 +99,7 @@ var fn = (self) => {
 			<RMenuItem
 				className="eft-menu-list"
 				onClick={() => {
-					var n = self.findNode(self.selectedNodeID);
+					let n = self.findNode(self.selectedNodeID);
 					if (!n) return;
 					keyInfo.delete(n);
 					self.closeMenu();

@@ -1,6 +1,13 @@
-const { app, BrowserWindow, screen, Menu, globalShortcut } = require("electron");
+const { app, BrowserWindow, screen, Menu } = require("electron");
 const path = require("path");
 const child = require("child_process");
+const Store = require("electron-store");
+const fs = require("fs");
+
+Store.initRenderer();
+
+var lock = path.join(__dirname, "lock");
+var lockServer = path.join(__dirname, "lock_server");
 
 class Main {
 	server = null;
@@ -8,13 +15,31 @@ class Main {
 
 	mainWindow = null;
 
+	kill(pid, callback = () => {}) {
+		if (process.platform === "win32") {
+			child.exec(`taskkill /T /F /PID ${pid}`, () => callback());
+		} else {
+			child.exec(`kill -9 ${pid}`, () => callback());
+		}
+	}
+
 	closeServer(callback) {
 		if (!this.server) return callback();
-		if (process.platform === "win32") {
-			child.exec(`taskkill /T /F /PID ${this.server.pid}`, () => callback());
-		} else {
-			child.exec(`kill -9 ${this.server.pid}`, () => callback());
+
+		var pid = 0;
+
+		if (fs.existsSync(lockServer)) {
+			pid = fs.readFileSync(lockServer, "utf-8");
+			fs.unlinkSync(lockServer);
+
+			this.kill(pid, callback);
 		}
+
+		if (this.server.pid != pid) {
+			this.kill(this.server.pid, callback);
+		}
+
+		fs.unlinkSync(lock);
 	}
 
 	startServer() {
@@ -34,23 +59,23 @@ class Main {
 			});
 
 			this.server.on("error", (err) => console.log(err));
+
+			fs.writeFileSync(lockServer, `${this.server.pid}`);
 		}
 	}
 
 	restart() {
+		fs.unlinkSync(lock);
 		app.relaunch();
-		app.exit();
+		this.quit();
 	}
 
 	checkSingle() {
-		const gotTheLock = app.requestSingleInstanceLock();
-		if (!gotTheLock) {
+		if (fs.existsSync(lock)) {
 			return false;
 		}
-
-		if (require("electron-squirrel-startup")) {
-			return false;
-		}
+		fs.writeFileSync(lock, `${process.pid}`);
+		return true;
 	}
 
 	lisnten() {
@@ -58,16 +83,16 @@ class Main {
 		// initialization and is ready to create browser windows.
 		// Some APIs can only be used after this event occurs.
 		app.on("ready", () => {
-			const ret = globalShortcut.register("CommandOrControl+P", () => {
-				if (this.mainWindow.webContents.isDevToolsOpened()) {
-					this.mainWindow.webContents.closeDevTools();
-				} else {
-					this.mainWindow.webContents.openDevTools();
-				}
-			});
+			// const ret = globalShortcut.register("CommandOrControl+P", () => {
+			// 	if (this.mainWindow.webContents.isDevToolsOpened()) {
+			// 		this.mainWindow.webContents.closeDevTools();
+			// 	} else {
+			// 		this.mainWindow.webContents.openDevTools();
+			// 	}
+			// });
 
-			// 检查快捷键是否注册成功
-			console.log(globalShortcut.isRegistered("CommandOrControl+P"));
+			// // 检查快捷键是否注册成功
+			// console.log(globalShortcut.isRegistered("CommandOrControl+P"));
 
 			console.log("main pid", process.pid);
 			if (this.server) console.log("child pid", this.server.pid);
@@ -81,7 +106,7 @@ class Main {
 			// On OS X it is common for applications and their menu bar
 			// to stay active until the user quits explicitly with Cmd + Q
 			// if (process.platform !== "darwin") {}
-			this.closeServer(() => app.quit());
+			this.quit();
 		});
 
 		app.on("activate", () => {
@@ -108,15 +133,42 @@ class Main {
 		if (width < 900) width = 900;
 		if (height < 600) height = 600;
 
+		// fix windos size
+		width = parseInt(width);
+		height = parseInt(height);
+
 		this.mainWindow = new BrowserWindow({
 			width: this.dev ? size.width * 1 : width,
 			height: this.dev ? size.height * 1 : height,
 			minWidth: width,
 			minHeight: height,
 			icon: path.join(__dirname, "redis.icns"),
+
+			show: false,
+			// transparent: true,
+			// titleBarStyle: "default",
+			// frame: false,
+
 			webPreferences: {
 				nodeIntegration: true,
+				enableRemoteModule: true,
+				contextIsolation: false,
 			},
+		});
+
+		// this.mainWindow.webContents.on("ready-to-show", () => {
+		// 	console.log("ready-to-show");
+		// 	this.mainWindow.show();
+		// });
+
+		this.mainWindow.on("close", () => {
+			console.log("close");
+			this.mainWindow.hide();
+		});
+
+		this.mainWindow.webContents.on("dom-ready", () => {
+			console.log("dom-ready");
+			this.mainWindow.show();
 		});
 
 		// and load the index.html of the app.
@@ -130,9 +182,14 @@ class Main {
 		if (this.dev) this.mainWindow.webContents.openDevTools();
 	}
 
+	quit() {
+		this.closeServer(() => app.quit());
+	}
+
 	start() {
-		if (this.checkSingle()) {
-			this.closeServer(() => app.quit());
+		if (!this.checkSingle()) {
+			this.quit();
+			return;
 		}
 
 		this.startServer();
@@ -145,7 +202,7 @@ class Main {
 						{
 							label: "Quit",
 							accelerator: "Command+Q",
-							click: () => this.closeServer(() => app.exit()),
+							click: () => this.quit(),
 						},
 					],
 				},

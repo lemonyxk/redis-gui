@@ -87,6 +87,7 @@ class AddKey extends Component {
 						this.setState({ key: e.target.value });
 					}}
 					autoComplete="off"
+					spellCheck="false"
 				/>
 			</FormControl>
 		);
@@ -106,6 +107,7 @@ class AddKey extends Component {
 						this.setState({ value: e.target.value });
 					}}
 					autoComplete="off"
+					spellCheck="false"
 				/>
 			</FormControl>
 		);
@@ -125,6 +127,7 @@ class AddKey extends Component {
 						this.setState({ hashKey: e.target.value });
 					}}
 					autoComplete="off"
+					spellCheck="false"
 				/>
 			</FormControl>
 		);
@@ -144,6 +147,7 @@ class AddKey extends Component {
 						this.setState({ streamKey: e.target.value });
 					}}
 					autoComplete="off"
+					spellCheck="false"
 				/>
 			</FormControl>
 		);
@@ -163,6 +167,7 @@ class AddKey extends Component {
 						this.setState({ score: e.target.value });
 					}}
 					autoComplete="off"
+					spellCheck="false"
 				/>
 			</FormControl>
 		);
@@ -182,6 +187,7 @@ class AddKey extends Component {
 						this.setState({ id: e.target.value });
 					}}
 					autoComplete="off"
+					spellCheck="false"
 				/>
 			</FormControl>
 		);
@@ -269,8 +275,8 @@ class AddKey extends Component {
 	}
 
 	async saveString() {
-		var cmd = ["SET", this.state.key, this.state.value];
-		var res = await Api.do(cmd);
+		let cmd = ["SET", this.state.key, this.state.value];
+		let res = await Api.do(cmd);
 		Comfirm.close();
 
 		if (res.code != 200) {
@@ -282,8 +288,8 @@ class AddKey extends Component {
 	}
 
 	async saveList() {
-		var cmd = ["LPUSH", this.state.key, this.state.value];
-		var res = await Api.do(cmd);
+		let cmd = ["LPUSH", this.state.key, this.state.value];
+		let res = await Api.do(cmd);
 		Comfirm.close();
 
 		if (res.code != 200) {
@@ -295,8 +301,8 @@ class AddKey extends Component {
 	}
 
 	async saveHash() {
-		var cmd = ["HSET", this.state.key, this.state.hashKey, this.state.value];
-		var res = await Api.do(cmd);
+		let cmd = ["HSET", this.state.key, this.state.hashKey, this.state.value];
+		let res = await Api.do(cmd);
 		Comfirm.close();
 
 		if (res.code != 200) {
@@ -308,8 +314,8 @@ class AddKey extends Component {
 	}
 
 	async saveSet() {
-		var cmd = ["SADD", this.state.key, this.state.value];
-		var res = await Api.do(cmd);
+		let cmd = ["SADD", this.state.key, this.state.value];
+		let res = await Api.do(cmd);
 		Comfirm.close();
 
 		if (res.code != 200) {
@@ -323,8 +329,8 @@ class AddKey extends Component {
 	async saveZset() {
 		this.state.score = parseFloat(this.state.score) || 0;
 
-		var cmd = ["ZADD", this.state.key, this.state.score, this.state.value];
-		var res = await Api.do(cmd);
+		let cmd = ["ZADD", this.state.key, this.state.score, this.state.value];
+		let res = await Api.do(cmd);
 		Comfirm.close();
 
 		if (res.code != 200) {
@@ -336,8 +342,8 @@ class AddKey extends Component {
 	}
 
 	async saveStream() {
-		var cmd = ["XADD", this.state.key, this.state.id, this.state.streamKey, this.state.value];
-		var res = await Api.do(cmd);
+		let cmd = ["XADD", this.state.key, this.state.id, this.state.streamKey, this.state.value];
+		let res = await Api.do(cmd);
 		Comfirm.close();
 
 		if (res.code != 200) {

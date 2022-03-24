@@ -29,7 +29,10 @@ func Close(conn *server.Conn) {
 
 	var t = time.Now()
 	time.AfterFunc(time.Second*10, func() {
-		if client.Time.Sub(t) < 0 {
+		// info will be deleted when the connection open
+		// so you need get the newest info
+		var client = app.Connections.Get(conn.Name)
+		if client != nil && client.Time.Sub(t) < 0 {
 			client.Close()
 			app.Connections.Delete(conn.Name)
 			console.Info("[websocket]", "close", conn.Name, conn.ClientIP())
