@@ -404,8 +404,6 @@ class Hash extends Component {
 		this.reset();
 		await this.getHash(this.props.path);
 		message.success("Add Row Success");
-
-		Comfirm.close();
 	}
 
 	changeKey(key) {

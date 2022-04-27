@@ -367,8 +367,6 @@ class Set extends Component {
 		this.reset();
 		await this.getSet(this.props.path);
 		message.success("Add Row Success");
-
-		Comfirm.close();
 	}
 
 	changeValue(value) {
